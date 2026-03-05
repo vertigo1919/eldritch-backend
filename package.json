@@ -1,0 +1,31 @@
+{
+  "name": "eldritch-backend",
+  "version": "0.1.0",
+  "description": "Backend for Eldritch a quiz-based multiplayer RPG",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "jest"
+  },
+  "author": "multiple",
+  "license": "MIT",
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.0.0",
+    "jest": "^29.0.0"
+  },
+  
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}
+
