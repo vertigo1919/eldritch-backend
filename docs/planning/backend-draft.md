@@ -5,14 +5,14 @@
 ```mermaid
 erDiagram
   USERS {
-    UUID id
+    UUID id PK
     TEXT display_name
     TIMESTAMPTZ created_at
     TIMESTAMPTZ last_seen
   }
 
   QUESTIONS {
-    SERIAL id
+    SERIAL id PK
     TEXT prompt
     TEXT option_a
     TEXT option_b
@@ -24,7 +24,7 @@ erDiagram
   }
 
   MONSTERS {
-    SERIAL id
+    SERIAL id PK
     TEXT name
     INT max_hp
     INT attack_damage
@@ -32,7 +32,7 @@ erDiagram
   }
 
   CHARACTERS {
-    SERIAL id
+    SERIAL id PK
     TEXT name
     TEXT image_url
     TEXT description
@@ -43,36 +43,35 @@ erDiagram
   }
 
   ROOMS {
-    TEXT code
-    UUID host_user_id
+    TEXT code PK
     TIMESTAMPTZ created_at
     TIMESTAMPTZ started_at
     TIMESTAMPTZ ended_at
   }
 
   MATCHES {
-    SERIAL id
-    TEXT room_code
-    UUID host_user_id
-    INT monster_id
+    SERIAL id PK
+    TEXT room_code FK
+    UUID host_user_id FK
+    INT monster_id FK
     TIMESTAMPTZ started_at
     TIMESTAMPTZ ended_at
     TEXT result
   }
 
   MATCH_PLAYERS {
-    INT match_id
-    UUID user_id
+    INT match_id PK, FK
+    UUID user_id PK, FK
     NUMERIC accuracy
   }
 
   %% Relationships
-  USERS ||--o{ ROOMS : "hosts"
-  USERS ||--o{ MATCHES : "hosts"
-  USERS ||--o{ MATCH_PLAYERS : "plays in"
-  MONSTERS ||--o{ MATCHES : "used in"
-  ROOMS ||--o{ MATCHES : "created from"
-  MATCHES ||--o{ MATCH_PLAYERS : "has"
+  USERS ||--o{ ROOMS : hosts
+  USERS ||--o{ MATCHES : hosts
+  USERS ||--o{ MATCH_PLAYERS : plays_in
+  MONSTERS ||--o{ MATCHES : used_in
+  ROOMS ||--o{ MATCHES : created_from
+  MATCHES ||--o{ MATCH_PLAYERS : has
 ```
 
 ## In-memory game state
