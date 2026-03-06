@@ -109,10 +109,18 @@ function roomExample() {
 - No need for API endpoints at least initially
 - No need for OOP, at least initially, just plain objects.
 
-## Sockets : custom events we will probably need
+## Sockets : event schema
 
-**joinRoom** (client to server)
-When: user enters name + code (or creates a new room).
+### joinRoom
+
+**direction**: (client to server)
+**trigger**: user enters name + code (or creates a new room).
+**payload**:
+**server side effects**:
+**Emits in response**:
+**error cases**:
+
+When:
 
 - The server updates the user table using UIID
 - Generates a new room code if needed
@@ -133,8 +141,14 @@ When: either after joinRoom or when someone disconnects
 - server initial match state (team HP, mosnter HP , questionIDs, currentQuestion, etc)
 - Triggers roundStarted
 
-**roundStarted** (server to client)
-when: at the beginnong of every round
+## roundStarted
+
+**direction**: server to client
+**trigger**: at the beginnong of every round
+**payload**:
+**Sent to**:
+**effects in front end**:
+**error cases**:
 
 - server sends current question data front ends shows question and starts countdown
 
