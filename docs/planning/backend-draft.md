@@ -113,65 +113,214 @@ function roomExample() {
 
 ### joinRoom
 
-**direction**: (client to server)
-**trigger**: user enters name + code (or creates a new room).
+**direction**: client to server  
+**trigger**: user enters name + room code (or clicks "Create room").
+
 **payload**:
+
+```
+{
+  name: "string",
+  roomCode: "string or empty"
+}
+```
+
 **server side effects**:
+
+- Update/add user in USERS table by UUID.
+- If no roomCode: generate code, add row to ROOMS with created_at.
+- If roomCode given: check room exists and is lobby status.
+- Add to rooms[code] memory object: roomStatus "lobby", players array, hostUserId if needed.
+- Socket joins the room.
+
 **Emits in response**:
+
+- Success (to room): lobbyUpdated with roomCode, hostUserId, players[], roomStatus.
+- Error (to client): joinError with {message, code: "ROOM_NOT_FOUND" | "ROOM_FULL" | etc}.
+
 **error cases**:
 
-When:
+- Room doesn't exist.
+- Room in-game or ended.
+- Room full (4 players).
+- No name.
 
-- The server updates the user table using UIID
-- Generates a new room code if needed
-- Updates room table
-- Server creates/updates the in‑memory rooms[code]
-- matches table is untouched as it's only used for finished games
+---
 
-**lobbyUpdated** (server to client)
-When: either after joinRoom or when someone disconnects
+### lobbyUpdated
 
-- Server sends out latest lobby state for that room
-- frontened updates players list
+**direction**: server to client  
+**trigger**: after joinRoom, disconnect, or host change.
 
-**startGame** (client to server)
-
-- When? Host clicks “Start” in the lobby.
-- Server loads monster, a fixed set of questions
-- server initial match state (team HP, mosnter HP , questionIDs, currentQuestion, etc)
-- Triggers roundStarted
-
-## roundStarted
-
-**direction**: server to client
-**trigger**: at the beginnong of every round
 **payload**:
-**Sent to**:
+
+```
+{
+  roomCode: "string",
+  hostUserId: "string",
+  players: [{userId, name}],
+  roomStatus: "lobby" | "in-game" | "ended"
+}
+```
+
+**Sent to**: All in room.
+
 **effects in front end**:
+
+- Show Lobby screen.
+- Update players list.
+- Host sees Start button.
+
+**error cases**: None.
+
+---
+
+### startGame
+
+**direction**: client to server  
+**trigger**: host clicks Start.
+
+**payload**:
+
+```
+{ roomCode: "string" }
+```
+
+**server side effects**:
+
+- Check: room exists, caller is host, status lobby, 1+ players.
+- Load monster, questions.
+- Set rooms[code]: status "in-game", teamHp, monsterHp, questionIds[], currentQuestionIndex 0, roundDeadline, answers map empty.
+- Emit roundStarted.
+
+**Emits in response**:
+
+- Success: roundStarted to room.
+- Error: startError {message, code: "NOT_HOST" | etc}.
+
 **error cases**:
 
-- server sends current question data front ends shows question and starts countdown
+- Not host.
+- Room wrong status.
+- No players.
 
-**submitAnswer** (client to Server)
-when:player clicks an answer button on Battle screen.
+---
 
-- the server saves the answer in memory
-- When all players have answered, or the round timer expires, server resolves the round.
+### roundStarted
 
-**roundResult** (server to client)
-When: after all players answer all rounds questions
+**direction**: server to client  
+**trigger**: after startGame or roundResult.
 
-- check correct options
-- calculate player correcntess
-- calculate damage
+**payload**:
 
-Front end shows:
-Correct answers
-Who was right/wrong?
-Updated HP bars.
+```
+{
+  roomCode, roundNumber, questionId,
+  prompt, options: {a,b,c,d},
+  roundDeadline, teamHp, monsterHp
+}
+```
 
-**gameEnded** (server to client)
-when? when monster is deafted
+**Sent to**: All in room.
 
-- saves match in DB and save accuracy per user per match
-- Frontend navigates to Game Over screen.
+**effects in front end**:
+
+- Show Battle screen.
+- Display question + buttons.
+- Start countdown.
+
+**error cases**: None.
+
+---
+
+### submitAnswer
+
+**direction**: client to server  
+**trigger**: player clicks answer.
+
+**payload**:
+
+```
+{ roomCode, questionId, answer: "a|b|c|d" }
+```
+
+**server side effects**:
+
+- Check room in-game, question matches, before deadline.
+- Save answer in rooms[code].answers[userId] if not set.
+- When all answered or timeout:
+  - Calc per-player correct, team/monster damage.
+  - Update HPs.
+  - If monsterHp <=0 → victory.
+  - If teamHp <=0 → defeat.
+  - Else next roundStarted.
+
+**Emits in response**:
+
+- Optional: answerAccepted to sender.
+- Then: roundResult or gameEnded.
+
+**error cases**:
+
+- After deadline.
+- Wrong question.
+
+---
+
+### roundResult
+
+**direction**: server to client  
+**trigger**: round resolved.
+
+**payload**:
+
+```
+{
+  roomCode, roundNumber, questionId, correctOption,
+  perPlayer: [{userId, name, answer, isCorrect}],
+  teamDamageTaken, monsterDamageTaken,
+  teamHpAfter, monsterHpAfter, isFinalRound
+}
+```
+
+**Sent to**: All in room.
+
+**effects in front end**:
+
+- Show correct answer, who got it right/wrong.
+- Update HP bars.
+- Wait for next round or end.
+
+**error cases**: None.
+
+---
+
+### gameEnded
+
+**direction**: server to client  
+**trigger**: HP hits 0.
+
+**payload**:
+
+```
+{
+  roomCode, result: "victory"|"defeat",
+  monsterId, teamHpFinal, monsterHpFinal,
+  perPlayerAccuracy: [{userId, name, accuracy}]
+}
+```
+
+**server side effects**:
+
+- Save MATCHES row: ended_at, result, etc.
+- Save MATCH_PLAYERS with accuracy.
+- Set roomStatus "ended".
+
+**effects in front end**:
+
+- Go to Victory/Game Over screen.
+- Show final stats.
+
+**error cases**: None.
+
+---
