@@ -29,6 +29,7 @@ export async function saveMatch(_data) {
   // to be filled in
   // data format { roomCode, hostUserId, monsterId, startedAt, endedAt, result }
   // called at: gameEnded, once per match
+  // must return { id } — the new match id, needed by saveMatchPlayers
 }
 export async function saveMatchPlayers(_data) {
   // to be filled in
