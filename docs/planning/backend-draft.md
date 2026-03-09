@@ -65,6 +65,17 @@ erDiagram
     NUMERIC accuracy
   }
 
+ITEMS {
+  SERIAL id PK
+  TEXT name
+  TEXT description
+  TEXT image_url
+  TEXT type
+  INT boost_attack
+  INT boost_defense
+  INT boost_sanity
+}
+
   %% Relationships
   USERS ||--o{ ROOMS : hosts
   USERS ||--o{ MATCHES : hosts
