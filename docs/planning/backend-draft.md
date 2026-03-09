@@ -74,6 +74,27 @@ erDiagram
   MATCHES ||--o{ MATCH_PLAYERS : has
 ```
 
+USERS
+Stores every player who has ever joined a room. Gets written to on socket joinRoom. Mainly exists so we can tie match history and accuracy stats back to the UUID and so that later on once we add user authentication we already have a user table.
+
+QUESTIONS
+Quiz content, seeded once, never written to during gameplay. The server reads from this on startGame to pick a set of questions for the match.
+
+MONSTERS
+Also static seed data. The server reads one row on startGame to get the monster's name and all other details.
+
+CHARACTERS
+Static content. Not touched during game, it's here for when we add character picking before the lobby.
+
+ROOMS
+A record that a room existed. Written to when the host creates the room, and updated with started_at and ended_at as the game progresses. Useful for game history. N.B. the live game state lives in memory, not here.
+
+MATCHES
+The main record of a completed game, so we have a game history. Only written to at gameEnded. Links a room, a host, and a monster together with the outcome.
+
+MATCH_PLAYERS
+Junction table. One row per player per match, storing their accuracy score. Written to at gameEnded alongside the MATCHES row. We have it so we can build a leaderboard.
+
 ## In-memory game state
 
 ```js

@@ -26,14 +26,26 @@ Socket.io relies on the WebSocket protocol, which creates a persistent, bidirect
 
 To use socket you want to wrap the Express app in an HTTP server. Once you've donw this this server can handle both normal HTTP requests and, once we attach Socket.IO, WebSocket upgrades.
 
-![[Screenshot 2026-03-09 at 09.49.06.png]]
+```
+                 ┌───────────────┐
+                 │   HTTP SERVER │
+                 └───────┬───────┘
+                         │
+         ┌───────────────┴───────────────┐
+         │                               │
+   Express routes                   Socket.IO
+   (REST API)                       (Realtime)
+         │                               │
+   GET /api/users                  send-message
+   POST /login                     receive-message
+```
 
 #### /app.js
 
 Here you create an Express object and manage routes and middleware.
 
 ```js
-const express = require("express");
+const express = require('express');
 
 const app = express();
 
@@ -49,11 +61,11 @@ This will create an http server that will use the express app for request handli
 - import the express app, as well as http and socket
 
 ```js
-const app = require("./app");
+const app = require('./app');
 
-const http = require("http");
+const http = require('http');
 
-const { Server } = require("socket.io");
+const { Server } = require('socket.io');
 ```
 
 - crete an http server that use your express app for requet hand
@@ -67,9 +79,9 @@ const server = http.createServer(app);
 ```js
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: 'http://localhost:5173',
 
-    methods: ["GET", "POST"],
+    methods: ['GET', 'POST'],
   },
 });
 ```
@@ -79,7 +91,7 @@ const io = new Server(server, {
 You now define what happens everytime a client connects via Socket.IO to this server you do this by defining this callback function.
 
 ```js
-io.on("connection", (socket) => {});
+io.on('connection', (socket) => {});
 ```
 
 In defining this you have a socket object representing the connection to a client.
@@ -87,7 +99,7 @@ In defining this you have a socket object representing the connection to a clien
 Each connected client has a unique id. SO you want to log that. Then you define the custom events emits and event handlers.
 
 ```js
-console.log("client connected:", socket.id);
+console.log('client connected:', socket.id);
 ```
 
 ### Frontend
@@ -101,9 +113,9 @@ Then set up front end project
 1. Craete a "ChatTest.jsx" component and render it in app.jsx
 
 ```js
-import { useState } from "react";
+import { useState } from 'react';
 
-import ChatTest from "./ChatTest";
+import ChatTest from './ChatTest';
 
 function App() {
   const [count, setCount] = useState(0);
