@@ -356,3 +356,36 @@ function roomExample() {
 **error cases**: None.
 
 ---
+## Error Codes
+### joinRoom errors
+Event: joinError (server to client)
+
+- `NO_NAME` – message: `"Name is required"`
+- `ROOM_NOT_FOUND` – `"Room not found"`
+- `ROOM_IN_GAME` – `"Game already started"`
+- `ROOM_ENDED` – `"Game has already ended"`
+- `ROOM_FULL` – `"Room is full"`
+  
+Payload format: 
+```js
+{
+  message: string,
+  code: 'NO_NAME' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL'
+}
+```
+### startGame errors
+Event: `startError` (server to client)  
+
+- `NOT_HOST` – `"Only the host can start the game"`
+- `WRONG_STATUS` – `"Room is not in lobby state"`
+- `NO_PLAYERS` – `"At least one player is required to start"`
+
+Payload:
+
+```js
+{
+  message: string,
+  code: 'NOT_HOST' | 'WRONG_STATUS' | 'NO_PLAYERS'
+}
+```
+
