@@ -1,7 +1,7 @@
-import { saveUser, createRoomRecord } from '../db/queries';
-import { generateRoomCode } from '../utils/generateRoomCode';
-import { rooms } from '../rooms';
-import { MAX_PLAYERS } from '../constants';
+import { saveUser, createRoomRecord } from '../db/queries.js';
+import { generateRoomCode } from '../utils/generateRoomCode.js';
+import { rooms } from '../rooms.js';
+import { MAX_PLAYERS } from '../constants.js';
 
 export async function handleJoinRoom(io, socket, payload) {
   // if we recive a roomCode it means that are trying to join
