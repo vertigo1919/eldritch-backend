@@ -361,18 +361,19 @@ function roomExample() {
 ### joinRoom errors
 Event: joinError (server to client)
 
-- `NO_NAME` – message: `"Name is required"`
-- `NO_USER` – message: `"User is required"`
+- `NO_NAME` – `"Name is required"`
+- `NO_USER` – `"User is required"`
 - `ROOM_NOT_FOUND` – `"Room not found"`
 - `ROOM_IN_GAME` – `"Game already started"`
 - `ROOM_ENDED` – `"Game has already ended"`
 - `ROOM_FULL` – `"Room is full"`
+- `SERVER_ERROR` - `"Unable to create room record in DB"`
   
 Payload format: 
 ```js
 {
   message: string,
-  code: 'NO_NAME' |'NO_USER' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL'
+  code: 'NO_NAME' |'NO_USER' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL | 'SERVER_ERROR'
 }
 ```
 ### startGame errors
