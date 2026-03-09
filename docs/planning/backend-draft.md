@@ -362,6 +362,7 @@ function roomExample() {
 Event: joinError (server to client)
 
 - `NO_NAME` – message: `"Name is required"`
+- `NO_USER` – message: `"User is required"`
 - `ROOM_NOT_FOUND` – `"Room not found"`
 - `ROOM_IN_GAME` – `"Game already started"`
 - `ROOM_ENDED` – `"Game has already ended"`
@@ -371,7 +372,7 @@ Payload format:
 ```js
 {
   message: string,
-  code: 'NO_NAME' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL'
+  code: 'NO_NAME' |'NO_USER' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL'
 }
 ```
 ### startGame errors
