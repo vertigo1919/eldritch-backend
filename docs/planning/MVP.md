@@ -37,7 +37,7 @@ Build a real-time 4-player quiz combat prototype where all players answer the sa
 
 - Room size: **1–4 players**
 
-- Shared Team HP: single pool for the whole room
+- Shared Team HP: single pool for the whole room. It is calculated at the start of the game by summing the base stats of all selected characters in the room.
 
 - Each round uses the same question for all players
 
