@@ -257,47 +257,47 @@ export async function updateRoomEnded(_roomCode) {
 }
 
 export async function getCharacter(characterId) {
-  // to be filled in
-  // called at: joinRoom
-  // Action: retrieves entire selected character object
+  // Action: retrieves entire selected character object based on new CHARACTERS schema
   const mockCharacters = [
     {
       id: 1,
       name: 'The Scholar',
-      image_url: 'character1.png',
+      image_name: 'character1.png',
       description: 'A seeker of forbidden knowledge.',
+      backstory: 'Once a professor at Miskatonic, they saw too much in the restricted archives.',
       base_attack: 5,
-      base_defense: 5,
       base_sanity: 150,
       difficulty_scaling: 1,
     },
     {
       id: 2,
       name: 'The Investigator',
-      image_url: 'character2.png',
+      image_name: 'character2.png',
       description: 'Used to dealing with the unknown.',
+      backstory: 'A former private eye who specializes in missing persons cases that "dont exist."',
       base_attack: 10,
-      base_defense: 10,
       base_sanity: 120,
       difficulty_scaling: 1,
     },
     {
       id: 3,
       name: 'The Occultist',
-      image_url: 'character3.png',
+      image_name: 'character3.png',
       description: 'Dabbles in the dark arts.',
+      backstory:
+        'They realized early on that to fight the darkness, one must understand its language.',
       base_attack: 15,
-      base_defense: 5,
       base_sanity: 90,
       difficulty_scaling: 2,
     },
     {
       id: 4,
       name: 'The Veteran',
-      image_url: 'character4.png',
+      image_name: 'character4.png',
       description: 'Hardened by past conflicts.',
+      backstory:
+        'Survived a trench assault that defied the laws of physics. They haven’t slept since.',
       base_attack: 20,
-      base_defense: 15,
       base_sanity: 70,
       difficulty_scaling: 2,
     },
