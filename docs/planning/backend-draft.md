@@ -110,33 +110,49 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 ## In-memory game state
 
 ```js
-function roomExample() {
   const roomStatusExample = {
     code: 'ABCD',
     hostUserId: 'uuid-123',
-    roomStatus: 'lobby', // or "in-game" or "ended"
+    roomStatus: 'in-game', // or "lobby" or "ended"
     players: [
-      { userId: 'uuid-123', socketId: 'socket-1', name: 'Alice', character:{ },
-      { userId: 'uuid-456', socketId: 'socket-2', name: 'Bob', character: { },
+      { 
+      userId: 'uuid-123', 
+      socketId: 'socket-1', 
+      name: 'Alice', 
+      character: {
+        id: 1,
+        name: 'The Scholar',
+        image_url: 'character1.png',
+        description: 'A seeker of forbidden knowledge.',
+        base_attack: 5,
+        base_defense: 5,
+        base_sanity: 150,
+        difficulty_scaling: 1
+      }
+    }
     ],
     currentStage: 1, // 1/2/3
     roundNumber: 1, // nth round across the whole game session
-    teamHp: 100,
+    teamHp: 150,
+    monster: {
+      id: 1,
+      name: 'Skeleton Knight',
+      max_hp: 80,
+      attack_damage: 10,
+      image_url: '',
+      difficulty_level: 'easy'
+    },
     monsterHp: 80,
-    monsterId: 1,
     questionIds: [10, 25, 7, 3, 19],
     currentQuestionIndex: 0,
     currentQuestionId: 10,
     roundDeadline: Date.now() + 15000,
     answers: {
-      'uuid-123': null,
-      'uuid-456': null,
+      'uuid-123': null
     },
   };
 
-  // Globaltore for all active rooms
   const rooms = { ABCD: roomStatusExample };
-}
 ```
 
 ## Imporntant considerations
