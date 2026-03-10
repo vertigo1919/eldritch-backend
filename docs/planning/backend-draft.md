@@ -372,7 +372,7 @@ Event: `startError` (server to client)
 
 - `NOT_HOST` – `"Only the host can start the game"`
 - `WRONG_STATUS` – `"Room is not in lobby state"`
-- `NO_PLAYERS` – `"At least one player is required to start"`
+- `NOT_ENOUGH_PLAYERS` – `"At least x players are required to start"`
 
 Payload:
 
