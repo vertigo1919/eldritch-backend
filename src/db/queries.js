@@ -256,8 +256,14 @@ export async function updateRoomEnded(_roomCode) {
   // called at: gameEnded
 }
 
+export async function getAllCharacters() {
+  // this is the function that will be needed for GET /api/characters
+}
+
 export async function getCharacter(characterId) {
-  // Action: retrieves entire selected character object based on new CHARACTERS schema
+  // Action: retrieves chracter based on ID
+  // we still need this (even if the charcter selection screen feteches via API) because backend needs to load character
+  // from BE not from FE
   const mockCharacters = [
     {
       id: 1,
