@@ -28,6 +28,7 @@ erDiagram
     TEXT name
     INT max_hp
     INT attack_damage
+    TEXT difficulty_level
     TEXT image_url
   }
 
@@ -89,10 +90,10 @@ USERS
 Stores every player who has ever joined a room. Gets written to on socket joinRoom. Mainly exists so we can tie match history and accuracy stats back to the UUID and so that later on once we add user authentication we already have a user table.
 
 QUESTIONS
-Quiz content, seeded once, never written to during gameplay. The server reads from this on startGame to pick a set of questions for the match.
+Quiz content, seeded once, never written to during gameplay. The server reads from this on startGame to pick a set of questions for the match. Questions difficulty is "easy", "medium", "hard".
 
 MONSTERS
-Also static seed data. The server reads one row on startGame to get the monster's name and all other details.
+Also static seed data. The server reads one row on startGame to get the monster's name and all other details. Monsters difficulty's level is "easy", "medium", "hard".
 
 CHARACTERS
 Static content. Not touched during game, it's here for when we add character picking before the lobby.
