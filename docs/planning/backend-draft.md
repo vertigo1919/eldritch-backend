@@ -1,4 +1,4 @@
-# Eldritch-Backend Initial Draft
+# Eldritch-Backend Specification
 
 ## DB schema
 
@@ -408,3 +408,11 @@ Payload:
   code: 'WRONG_STATUS' | 'DEADLINE_PASSED' | 'WRONG_QUESTION' | 'ALREADY_ANSWERED'
 }
 ```
+## Internal Game Logic Functions
+
+### startNextRound(io, code)
+This function handles the preparation and delivery of a new question to the room. It reads the current question data from the room's object, calculates the deadline timestamp, and starts the setTimeout timer that will force the round to end if players do not answer. Once the timer is set, it broadcasts roundStarted payload to all players in the room. This function is called  by handleStartGame for the first question, and then by resolveRound for all subsequent questions.
+
+### resolveRound(io, code)
+
+This function calculatess the outcome of the player submissions. It clears the round timer, compares each player's submitted answer against the correct option, and deducts health points from the monster for correct answers or from the team for incorrect and missing answers. After updating the HPs, it checks  win and loss . If  team HP reaches zero or the final monster is defeated, it emits  gameEnded . If the game is still active, it emits roundResult and then calls startNextRound to continue the game loop.
