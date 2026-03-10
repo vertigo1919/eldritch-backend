@@ -143,6 +143,20 @@ Junction table. One row per player per match, storing their accuracy score. Writ
       difficulty_level: 'easy'
     },
     monsterHp: 80,
+    questions: [
+      {
+        question_id: 10,
+        prompt: 'Binary of decimal 2?',
+        option_a: '10',
+        option_b: '11',
+        option_c: '01',
+        option_d: '00',
+        correct_option: 'a',
+        difficulty: 'medium',
+        category: 'tech',
+      }
+      // ... of course more questions here
+    ],
     questionIds: [10, 25, 7, 3, 19],
     currentQuestionIndex: 0,
     currentQuestionId: 10,
