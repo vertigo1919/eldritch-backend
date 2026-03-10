@@ -371,21 +371,36 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 
 ```
 {
-  roundNumber, questionId, correctOption,
-  perPlayer: [{userId, name, answer, isCorrect}],
-  teamDamageTaken, monsterDamageTaken,
-  teamHpAfter, monsterHpAfter, isFinalRound
+  "roundNumber": 1,
+  "questionId": 10,
+  "correctOption": "c",
+  "playerResults": [
+    {
+      "userId": "uuid-123",
+      "name": "Alice",
+      "answer": "c",
+      "isCorrect": true,
+      "correctAnswers": 5,
+      "totalQuestions": 10
+    }, {player2}, etc.
+  ],
+  "teamDamageTaken": 10,
+  "monsterDamageTaken": 15,
+  "teamHpAfter": 140,
+  "monsterHpAfter": 65,
+  "isFinalRound": false
 }
 ```
 
 **Sent to**: All in room.
 
 **effects in front end**:
+- Update HP: Animate the health bars for both the team and the monster.
 
-- Show correct answer, who got it right/wrong.
-- Update HP bars.
-- Wait for next round or end.
-
+optional:
+- Show results: Display the correct answer and highlight who got it right/wrong.
+- Refresh Stats: Update the "Live Accuracy" display for each player using the new correctAnswers and totalQuestions values.
+- Wait: Display the results for a few seconds before the next roundStarted event arrives.
 ---
 
 ### gameEnded
