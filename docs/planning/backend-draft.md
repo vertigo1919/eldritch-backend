@@ -171,13 +171,6 @@ function roomExample() {
 - Success (to room): lobbyUpdated with roomCode, hostUserId, players[], roomStatus.
 - Error (to client): joinError with {message, code: "ROOM_NOT_FOUND" | "ROOM_FULL" | etc}.
 
-**error cases**:
-
-- Room doesn't exist.
-- Room in-game or ended.
-- Room full (4 players).
-- No name.
-
 ---
 
 ### lobbyUpdated
@@ -204,8 +197,6 @@ function roomExample() {
 - Update players list.
 - Host sees Start button.
 
-**error cases**: None.
-
 ---
 
 ### startGame
@@ -213,7 +204,7 @@ function roomExample() {
 **direction**: client to server  
 **trigger**: host clicks Start.
 
-**payload**: none > we use socket.data to obtain user display name and room code.
+**payload**: none — roomCode and userId are read server-side from socket.data.
 
 **server side effects**:
 
@@ -226,13 +217,6 @@ function roomExample() {
 
 - Success: roundStarted to room.
 - Error: startError {message, code: "NOT_HOST" | etc}.
-
-**error cases**:
-
-- Not host.
-- Room wrong status.
-- No players.
-
 ---
 
 ### roundStarted
@@ -244,7 +228,7 @@ function roomExample() {
 
 ```
 {
-  roomCode, roundNumber, questionId,
+  roundNumber, questionId,
   prompt, options: {a,b,c,d},
   roundDeadline, teamHp, monsterHp
 }
@@ -257,8 +241,6 @@ function roomExample() {
 - Show Battle screen.
 - Display question + buttons.
 - Start countdown.
-
-**error cases**: None.
 
 ---
 
@@ -288,11 +270,7 @@ function roomExample() {
 
 - Optional: answerAccepted to sender.
 - Then: roundResult or gameEnded.
-
-**error cases**:
-
-- After deadline.
-- Wrong question.
+- Error: answerError
 
 ---
 
@@ -305,7 +283,7 @@ function roomExample() {
 
 ```
 {
-  roomCode, roundNumber, questionId, correctOption,
+  roundNumber, questionId, correctOption,
   perPlayer: [{userId, name, answer, isCorrect}],
   teamDamageTaken, monsterDamageTaken,
   teamHpAfter, monsterHpAfter, isFinalRound
@@ -320,8 +298,6 @@ function roomExample() {
 - Update HP bars.
 - Wait for next round or end.
 
-**error cases**: None.
-
 ---
 
 ### gameEnded
@@ -333,7 +309,7 @@ function roomExample() {
 
 ```
 {
-  roomCode, result: "victory"|"defeat",
+  result: "victory"|"defeat",
   monsterId, teamHpFinal, monsterHpFinal,
   perPlayerAccuracy: [{userId, name, accuracy}]
 }
@@ -350,12 +326,10 @@ function roomExample() {
 - Go to Victory/Game Over screen.
 - Show final stats.
 
-**error cases**: None.
-
 ---
 ## Error Codes
 ### joinRoom errors
-Event: joinError (server to client)
+Event: `joinError` (server to client)
 
 - `NO_NAME` – `"Name is required"`
 - `NO_USER` – `"User is required"`
@@ -369,7 +343,7 @@ Payload format:
 ```js
 {
   message: string,
-  code: 'NO_NAME' |'NO_USER' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL | 'SERVER_ERROR'
+  code: 'NO_NAME' |'NO_USER' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL` | 'SERVER_ERROR'
 }
 ```
 ### startGame errors
@@ -387,4 +361,18 @@ Payload:
   code: 'NOT_HOST' | 'WRONG_STATUS' | 'NO_PLAYERS'
 }
 ```
+### submitAnswer errors
+Event: `answerError` (server to client)  
 
+`WRONG_STATUS` – `"Room is not in-game"`
+`DEADLINE_PASSED` – `"The answer deadline has passed"`
+`WRONG_QUESTION` – `"Question ID does not match current round"`
+`ALREADY_ANSWERED` – `"You have already submitted an answer this round"`
+
+Payload:
+```js
+{
+  message: string,
+  code: 'WRONG_STATUS' | 'DEADLINE_PASSED' | 'WRONG_QUESTION' | 'ALREADY_ANSWERED'
+}
+```
