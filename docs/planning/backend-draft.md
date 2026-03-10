@@ -338,16 +338,17 @@ Event: `joinError` (server to client)
 - `NO_NAME` – `"Name is required"`
 - `NO_USER` – `"User is required"`
 - `ROOM_NOT_FOUND` – `"Room not found"`
+- `NO_CHARACTER` - `"Character selection is required"`
 - `ROOM_IN_GAME` – `"Game already started"`
 - `ROOM_ENDED` – `"Game has already ended"`
 - `ROOM_FULL` – `"Room is full"`
-- `SERVER_ERROR` - `"Unable to create room record in DB"`
+- `SERVER_ERROR` - `"A server error occurred"`
   
 Payload format: 
 ```js
 {
   message: string,
-  code: 'NO_NAME' |'NO_USER' | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL` | 'SERVER_ERROR'
+  code: 'NO_NAME' |'NO_USER' | `NO_CHARACTER` | 'ROOM_NOT_FOUND' | 'ROOM_IN_GAME' | 'ROOM_ENDED' | 'ROOM_FULL` | 'SERVER_ERROR'
 }
 ```
 ### startGame errors
