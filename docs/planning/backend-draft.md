@@ -161,13 +161,13 @@ Junction table. One row per player per match, storing their accuracy score. Writ
  - FE: A user opens the game, and either clicks a button to create a room or to join one emitting the joinRoom event.
  - BE: The server detects the joinRoom event and initialises the room object in memory and updates the users in memory as needed broadcasting everytime a lobbyUpdated event.
  - FE: Users are moved to the lobby. At some point the host clicks on a start game button emitting the StartGame event.
- - BE: The server detects the startGame event triggered by the host and loads initial data and hands control to the internal logic functions.
+ - BE: The server detects the startGame event triggered by the host and loads initial data (the first monster and the questions) and hands control to the internal logic functions.
 
 2.  Battle Loop
-  - BE startNextRound.js: this is called by startGame. Sets the 15s timer and emits roundStarted with the current question.
+  - BE startNextRound.js: this is called by startGame. Sets the 15s timer, laods the question and emits roundStarted with the current question. 
   - FE: the users are shown first question and and mutliple choices and timer. Once a user submits an answer they trigger the custom event "submitAnswer"
   - BE: The server detects the event SubmitAnswer,  receive and save answer. If all answers are received timer is ended early. It calls resolveRound.js function
-  - BE: resolveRound triggered by the timer expiring (in StartNextRound) OR all answers being in. It calculates damage and updates HPs. If monsters are not defeated and team HP > 0 calls startNextRound and battle loop continues. 
+  - BE: resolveRound triggered by the timer expiring (in StartNextRound) OR all answers being in. It calculates damage and updates HPs. If monsters are not defeated and team HP > 0 calls startNextRound and battle loop continues. Once the first monster is defreated, its up to startNextRound to load the new ones.
 
 3.  Resolution Phase
 - BE: resolveRound: on the other hand if either monster HP or team HP are <= 0 then gameEnded event is broadcasted  and final stats are saved to the database.
