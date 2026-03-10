@@ -35,12 +35,12 @@ erDiagram
   CHARACTERS {
     SERIAL id PK
     TEXT name
-    TEXT image_url
+    TEXT image_name
     TEXT description
     INT base_attack
-    INT base_defense
     INT base_sanity
     INT difficulty_scaling
+    TEXT backstory
   }
 
   ROOMS {
