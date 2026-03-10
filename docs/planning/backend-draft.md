@@ -118,7 +118,9 @@ Junction table. One row per player per match, storing their accuracy score. Writ
       { 
       userId: 'uuid-123', 
       socketId: 'socket-1', 
-      name: 'Alice', 
+      name: 'Alice',
+      correctAnswers: 5,
+      totalQuestions: 10,
       character: {
         id: 1,
         name: 'The Scholar',
