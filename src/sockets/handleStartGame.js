@@ -53,7 +53,7 @@ export async function handleStartGame(io, socket) {
 
   // Load questions in memory
   const monsterQuestions = await getRandomQuestions(QUESTIONS_PER_MONSTER, 'easy');
-  rooms[code].questionIds = monsterQuestions.map((question) => question.id);
+  rooms[code].questionIds = monsterQuestions.map((question) => question.question_id);
   rooms[code].currentQuestionIndex = 0;
   rooms[code].currentQuestionId = rooms[code].questionIds[0];
 

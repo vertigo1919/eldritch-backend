@@ -44,7 +44,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
   // Return mock questions for now
   const allQuestions = [
     {
-      id: 1,
+      question_id: 1,
       prompt: 'What is 2+2?',
       option_a: '3',
       option_b: '4',
@@ -56,7 +56,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
     },
 
     {
-      id: 2,
+      question_id: 2,
       prompt: 'What is 5−2?',
       option_a: '2',
       option_b: '3',
@@ -67,7 +67,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'math',
     },
     {
-      id: 3,
+      question_id: 3,
       prompt: 'Capital of France?',
       option_a: 'Berlin',
       option_b: 'Madrid',
@@ -78,7 +78,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'geography',
     },
     {
-      id: 4,
+      question_id: 4,
       prompt: 'What color is the sky on a clear day?',
       option_a: 'Blue',
       option_b: 'Green',
@@ -89,7 +89,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'general',
     },
     {
-      id: 5,
+      question_id: 5,
       prompt: 'Which is an even number?',
       option_a: '3',
       option_b: '5',
@@ -100,7 +100,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'math',
     },
     {
-      id: 6,
+      question_id: 6,
       prompt: 'How many days in a week?',
       option_a: '5',
       option_b: '6',
@@ -113,7 +113,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
 
     // difficulty 2 (medium)
     {
-      id: 7,
+      question_id: 7,
       prompt: 'What is 12÷3?',
       option_a: '3',
       option_b: '4',
@@ -124,7 +124,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'math',
     },
     {
-      id: 8,
+      question_id: 8,
       prompt: 'H2O is the chemical formula for?',
       option_a: 'Oxygen',
       option_b: 'Hydrogen',
@@ -135,7 +135,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'science',
     },
     {
-      id: 9,
+      question_id: 9,
       prompt: 'Largest planet in our solar system?',
       option_a: 'Earth',
       option_b: 'Jupiter',
@@ -146,7 +146,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'science',
     },
     {
-      id: 10,
+      question_id: 10,
       prompt: 'Binary of decimal 2?',
       option_a: '10',
       option_b: '11',
@@ -157,7 +157,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'tech',
     },
     {
-      id: 11,
+      question_id: 11,
       prompt: 'Prime number?',
       option_a: '9',
       option_b: '15',
@@ -170,7 +170,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
 
     // difficulty 3 (hard)
     {
-      id: 12,
+      question_id: 12,
       prompt: 'Derivative of x²?',
       option_a: 'x',
       option_b: '2x',
@@ -181,7 +181,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'math',
     },
     {
-      id: 13,
+      question_id: 13,
       prompt: 'Schrödinger is associated with which field?',
       option_a: 'Chemistry',
       option_b: 'Biology',
@@ -192,7 +192,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'science',
     },
     {
-      id: 14,
+      question_id: 14,
       prompt: 'Time complexity of binary search?',
       option_a: 'O(1)',
       option_b: 'O(log n)',
@@ -203,7 +203,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'tech',
     },
     {
-      id: 15,
+      question_id: 15,
       prompt: 'What does SQL stand for?',
       option_a: 'Structured Query Language',
       option_b: 'Simple Query Logic',
@@ -214,7 +214,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
       category: 'tech',
     },
     {
-      id: 16,
+      question_id: 16,
       prompt: 'Speed of light in vacuum (approx)?',
       option_a: '3×10⁶ m/s',
       option_b: '3×10⁸ m/s',
