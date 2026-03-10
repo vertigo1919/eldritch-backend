@@ -147,6 +147,7 @@ Junction table. One row per player per match, storing their accuracy score. Writ
     currentQuestionIndex: 0,
     currentQuestionId: 10,
     roundDeadline: Date.now() + 15000,
+    timerId: {Timeout object},
     answers: {
       'uuid-123': null
     },
