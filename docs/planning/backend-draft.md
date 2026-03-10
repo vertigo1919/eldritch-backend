@@ -158,7 +158,8 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 ## Game lifecyle 
 
 1.  Setup Phase
- - FE: A user opens the game, and either clicks a button to create a room or to join one emitting the joinRoom event.
+ - FE: A user opens the game, and either clicks a button to create a room or to join one, the inputted data is held in react memory.
+ - FE: A new screen then appears to choose a character, GET request to API to obtain list of available characters. Once selected a joinRoom event is emitted.
  - BE: The server detects the joinRoom event and initialises the room object in memory and updates the users in memory as needed broadcasting everytime a lobbyUpdated event.
  - FE: Users are moved to the lobby. At some point the host clicks on a start game button emitting the StartGame event.
  - BE: The server detects the startGame event triggered by the host and loads initial data (the first monster and the questions) and hands control to the internal logic functions.
@@ -167,7 +168,7 @@ Junction table. One row per player per match, storing their accuracy score. Writ
   - BE startNextRound.js: this is called by startGame. Sets the 15s timer, laods the question and emits roundStarted with the current question. 
   - FE: the users are shown first question and and mutliple choices and timer. Once a user submits an answer they trigger the custom event "submitAnswer"
   - BE: The server detects the event SubmitAnswer,  receive and save answer. If all answers are received timer is ended early. It calls resolveRound.js function
-  - BE: resolveRound triggered by the timer expiring (in StartNextRound) OR all answers being in. It calculates damage and updates HPs. If monsters are not defeated and team HP > 0 calls startNextRound and battle loop continues. Once the first monster is defreated, its up to startNextRound to load the new ones.
+  - BE: resolveRound triggered by the timer expiring (in StartNextRound) OR all answers being in. It calculates damage and updates HPs. If monsters are not defeated and team HP > 0 calls startNextRound and battle loop continues. Once the first monster is defeated, it loads the new one.
 
 3.  Resolution Phase
 - BE: resolveRound: on the other hand if either monster HP or team HP are <= 0 then gameEnded event is broadcasted  and final stats are saved to the database.
@@ -175,7 +176,7 @@ Junction table. One row per player per match, storing their accuracy score. Writ
     
 ## Imporntant considerations
 
-- No need for API endpoints at least initially
+- No need for API endpoints other than GET characters.
 - No need for OOP, at least initially, just plain objects.
 - The name/code entry and character selection happens locally in react, only once both are completed joinRoom is emitted by the client  with the full payload (name, userId, roomCode, characterId). This prevents "partial" players in the backend rooms state. If they're in the array, they're fully initialized.
 
@@ -249,8 +250,8 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 
 - Check: room exists, caller is host, status lobby, 1+ players.
 - Load monster, questions.
-- Set rooms[code]: status "in-game", teamHp, monsterHp, questionIds[], currentQuestionIndex 0, roundDeadline, answers map empty.
-- Emit roundStarted.
+- Set rooms[code]: status "in-game", teamHp, monsterHp, questionIds[], currentQuestionIndex 0, answers map empty.
+- Call internal startNextRound() function.
 
 **Emits in response**:
 
@@ -432,4 +433,4 @@ This function handles the preparation and delivery of a new question to the room
 
 ### resolveRound(io, code)
 
-This function calculatess the outcome of the player submissions. It clears the round timer, compares each player's submitted answer against the correct option, and deducts health points from the monster for correct answers or from the team for incorrect and missing answers. After updating the HPs, it checks  win and loss . If  team HP reaches zero or the final monster is defeated, it emits  gameEnded . If the game is still active, it emits roundResult and then calls startNextRound to continue the game loop.
+This function calculatess the outcome of the player submissions. It clears the round timer, compares each player's submitted answer against the correct option, and deducts health points from the monster for correct answers or from the team for incorrect and missing answers. After updating the HPs, it checks  win and loss . If  team HP reaches zero or the final monster is defeated, it emits  gameEnded . If the game is still active, it emits roundResult and then calls startNextRound to continue the game loop. If the monster's HP reaches zero but it is not the final stage, this function fetches the next monster and set of questions from the database, update the room state, and then calls internal function startNextRound.
