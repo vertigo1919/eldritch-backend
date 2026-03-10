@@ -160,13 +160,14 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 
 - No need for API endpoints at least initially
 - No need for OOP, at least initially, just plain objects.
+- The name/code entry and character selection happens locally in react, only once both are completed joinRoom is emitted by the client  with the full payload (name, userId, roomCode, characterId). This prevents "partial" players in the backend rooms state. If they're in the array, they're fully initialized.
 
 ## Sockets : event schema
 
 ### joinRoom
 
 **direction**: client to server  
-**trigger**: user enters name + room code (or clicks "Create room").
+**trigger**: user confirms character selection (Final step of the Join/Create flow).
 
 **payload**:
 
