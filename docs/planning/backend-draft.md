@@ -157,7 +157,8 @@ function roomExample() {
 {
   name: "string",
   roomCode: "string or empty"
-  userId: "UUID"
+  userId: "UUID",
+  characterId: 1
 }
 ```
 
