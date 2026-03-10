@@ -122,12 +122,12 @@ Junction table. One row per player per match, storing their accuracy score. Writ
       character: {
         id: 1,
         name: 'The Scholar',
-        image_url: 'character1.png',
+        image: 'character1.png',
         description: 'A seeker of forbidden knowledge.',
         base_attack: 5,
-        base_defense: 5,
         base_sanity: 150,
-        difficulty_scaling: 1
+        difficulty_scaling: 1,
+        backstory: 'I'm 82 and I am very wise'
       }
     }
     ],
