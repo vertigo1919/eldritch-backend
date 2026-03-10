@@ -119,6 +119,7 @@ function roomExample() {
       { userId: 'uuid-123', socketId: 'socket-1', name: 'Alice' },
       { userId: 'uuid-456', socketId: 'socket-2', name: 'Bob' },
     ],
+    currentStage: 1 // 1/2/3
     teamHp: 100,
     monsterHp: 80,
     monsterId: 1,
