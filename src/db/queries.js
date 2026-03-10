@@ -36,10 +36,6 @@ export async function getMonsterForStage(stageNumber) {
   return mockMonsters[stageNumber - 1];
 }
 
-// PLACEHOLDER FUNCTION for when we want to add custom mosnter selection
-// export async function getMonster(_id) {
-// }
-
 export async function getRandomQuestions(_quantity, _difficulty) {
   // Return mock questions for now
   const allQuestions = [
