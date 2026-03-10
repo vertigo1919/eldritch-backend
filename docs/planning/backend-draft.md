@@ -120,6 +120,7 @@ function roomExample() {
       { userId: 'uuid-456', socketId: 'socket-2', name: 'Bob' },
     ],
     currentStage: 1, // 1/2/3
+    roundNumber: 1, // nth round across the whole game session
     teamHp: 100,
     monsterHp: 80,
     monsterId: 1,
