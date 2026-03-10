@@ -213,11 +213,7 @@ function roomExample() {
 **direction**: client to server  
 **trigger**: host clicks Start.
 
-**payload**:
-
-```
-{ roomCode: "string" }
-```
+**payload**: none > we use socket.data to obtain user display name and room code.
 
 **server side effects**:
 
@@ -274,7 +270,7 @@ function roomExample() {
 **payload**:
 
 ```
-{ roomCode, questionId, answer: "a|b|c|d" }
+{ questionId, answer: "a|b|c|d" }
 ```
 
 **server side effects**:
