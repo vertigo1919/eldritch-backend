@@ -12,7 +12,7 @@ erDiagram
   }
 
   QUESTIONS {
-    SERIAL id PK
+    SERIAL question_id PK
     TEXT prompt
     TEXT option_a
     TEXT option_b
