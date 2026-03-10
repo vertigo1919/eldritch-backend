@@ -12,7 +12,7 @@ export async function getMonsterForStage(stageNumber) {
       name: 'Skeleton Knight',
       max_hp: 80,
       attack_damage: 10,
-      image_url: '',
+      image_name: '',
       difficulty_level: 'easy',
     },
     {
@@ -20,7 +20,7 @@ export async function getMonsterForStage(stageNumber) {
       name: 'Crypt Warden',
       max_hp: 120,
       attack_damage: 15,
-      image_url: '',
+      image_name: '',
       difficulty_level: 'medium',
     },
     {
@@ -28,7 +28,7 @@ export async function getMonsterForStage(stageNumber) {
       name: 'Eldritch Horror',
       max_hp: 160,
       attack_damage: 20,
-      image_url: '',
+      image_name: '',
       difficulty_level: 'hard',
     },
   ];
