@@ -188,7 +188,7 @@ function roomExample() {
 {
   roomCode: "string",
   hostUserId: "string",
-  players: [{userId, name}],
+  players: [{userId, name, character}],
   roomStatus: "lobby" | "in-game" | "ended"
 }
 ```
