@@ -116,8 +116,8 @@ function roomExample() {
     hostUserId: 'uuid-123',
     roomStatus: 'lobby', // or "in-game" or "ended"
     players: [
-      { userId: 'uuid-123', socketId: 'socket-1', name: 'Alice' },
-      { userId: 'uuid-456', socketId: 'socket-2', name: 'Bob' },
+      { userId: 'uuid-123', socketId: 'socket-1', name: 'Alice', character:{ },
+      { userId: 'uuid-456', socketId: 'socket-2', name: 'Bob', character: { },
     ],
     currentStage: 1, // 1/2/3
     roundNumber: 1, // nth round across the whole game session
