@@ -249,9 +249,21 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 
 ```
 {
-  roundNumber, questionId,
-  prompt, options: {a,b,c,d},
-  roundDeadline, teamHp, monsterHp
+  monster: {
+    name: "string",
+    hp: number,
+    maxHp: number,
+    image: "string"
+  },
+  question: {
+    prompt: "string",
+    options: { a, b, c, d }
+  },
+  gameState: {
+    teamHp: number,
+    roundNumber: number,
+    roundDeadline: number
+  }
 }
 ```
 
