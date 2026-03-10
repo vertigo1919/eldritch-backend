@@ -301,11 +301,8 @@ Junction table. One row per player per match, storing their accuracy score. Writ
   - Else next roundStarted.
 
 **Emits in response**:
-
-- Optional: answerAccepted to sender.
-- Then: roundResult or gameEnded.
 - Error: answerError
-
+-  Success: triggers internal round resolution function (resolveRound.js) which subsequently emits roundResult or gameEnded to the room.
 ---
 
 ### roundResult
