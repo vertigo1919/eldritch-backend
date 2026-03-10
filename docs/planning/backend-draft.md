@@ -1,4 +1,4 @@
-# Eldritch-Backend Specification
+# Eldritch Backend Specification
 
 ## DB schema
 
