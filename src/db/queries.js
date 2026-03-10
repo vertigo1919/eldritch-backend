@@ -255,3 +255,53 @@ export async function updateRoomEnded(_roomCode) {
   // action: update existing row in ROOMS table where code = roomCode, set ended_at = current timestamp
   // called at: gameEnded
 }
+
+export async function getCharacter(characterId) {
+  // to be filled in
+  // called at: joinRoom
+  // Action: retrieves entire selected character object
+  const mockCharacters = [
+    {
+      id: 1,
+      name: 'The Scholar',
+      image_url: 'character1.png',
+      description: 'A seeker of forbidden knowledge.',
+      base_attack: 5,
+      base_defense: 5,
+      base_sanity: 150,
+      difficulty_scaling: 1,
+    },
+    {
+      id: 2,
+      name: 'The Investigator',
+      image_url: 'character2.png',
+      description: 'Used to dealing with the unknown.',
+      base_attack: 10,
+      base_defense: 10,
+      base_sanity: 120,
+      difficulty_scaling: 1,
+    },
+    {
+      id: 3,
+      name: 'The Occultist',
+      image_url: 'character3.png',
+      description: 'Dabbles in the dark arts.',
+      base_attack: 15,
+      base_defense: 5,
+      base_sanity: 90,
+      difficulty_scaling: 2,
+    },
+    {
+      id: 4,
+      name: 'The Veteran',
+      image_url: 'character4.png',
+      description: 'Hardened by past conflicts.',
+      base_attack: 20,
+      base_defense: 15,
+      base_sanity: 70,
+      difficulty_scaling: 2,
+    },
+  ];
+
+  return mockCharacters.find((c) => c.id === Number(characterId));
+}
