@@ -175,12 +175,35 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 - FE: it lsitens for gameEnded when it reiceves it either shows a win screen or gameover screen.
     
 ## Imporntant considerations
-
-- No need for API endpoints other than GET characters.
+- No need for API endpoints other than GET characters. This because chracters objects are stating and are fetched before the game starts. Once the game stars web sockets are much more suitable.
 - No need for OOP, at least initially, just plain objects.
 - The name/code entry and character selection happens locally in react, only once both are completed joinRoom is emitted by the client  with the full payload (name, userId, roomCode, characterId). This prevents "partial" players in the backend rooms state. If they're in the array, they're fully initialized.
 
+## REST API Endpoints
+
+### GET /api/characters
+**Description**: Fetches the static list of available characters for the frontend selection screen before a socket connection is established.
+
+**Query Parameters**: None
+
+**Response**: 200 OK
+```json
+[
+  {
+    "id": 1,
+    "name": "The Scholar",
+    "image_name": "character1.png",
+    "description": "A seeker of forbidden knowledge.",
+    "base_attack": 5,
+    "base_sanity": 150,
+    "difficulty_scaling": 1,
+    "backstory": "I'm 82 and I am very wise"
+  }
+]
+```
+
 ## Sockets : event schema
+
 
 ### joinRoom
 
