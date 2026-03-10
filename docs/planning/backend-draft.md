@@ -399,7 +399,7 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 
 optional:
 - Show results: Display the correct answer and highlight who got it right/wrong.
-- Refresh Stats: Update the "Live Accuracy" display for each player using the new correctAnswers and totalQuestions values.
+- Refresh Stats: Update the "Live Accuracy" display for each player using correctAnswers and totalQuestions.
 - Wait: Display the results for a few seconds before the next roundStarted event arrives.
 ---
 
