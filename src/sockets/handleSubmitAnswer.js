@@ -1,5 +1,5 @@
 import { rooms } from '../rooms.js';
-import { resolveRound } from './resolveRound.js';
+import { resolveRound } from '../logic/resolveRound.js';
 
 export function handleSubmitAnswer(io, socket, payload) {
   //Get socket details
