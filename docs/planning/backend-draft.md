@@ -69,7 +69,7 @@ ITEMS {
   SERIAL item_id PK
   TEXT name
   TEXT description
-  TEXT image_url
+  TEXT image_name
   TEXT type
   INT boost_attack
   INT boost_defense
