@@ -46,7 +46,6 @@ erDiagram
   ROOMS {
     TEXT code PK
     TIMESTAMPTZ created_at
-    TIMESTAMPTZ started_at
     TIMESTAMPTZ ended_at
   }
 
