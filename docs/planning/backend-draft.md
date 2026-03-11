@@ -388,7 +388,19 @@ Junction table. One row per player per match, storing their accuracy score. Writ
   "monsterDamageTaken": 15,
   "teamHpAfter": 140,
   "monsterHpAfter": 65,
-  "isFinalRound": false
+  "isFinalRound": false,
+
+//The following fields are ONLY included if the monster was defeated and the team is moving to next round
+"isNextStage": true,
+  "nextStage": 2,
+  "nextMonster": {
+    "monster_id": 2,
+    "name": "Crypt Warden",
+    "max_hp": 120,
+    "attack_damage": 15,
+    "image_name": "",
+    "difficulty_level": "medium"
+  }
 }
 ```
 
