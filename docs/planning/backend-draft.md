@@ -5,7 +5,7 @@
 ```mermaid
 erDiagram
   USERS {
-    UUID id PK
+    UUID user_id PK
     TEXT display_name
     TIMESTAMPTZ created_at
     TIMESTAMPTZ last_seen
@@ -24,7 +24,7 @@ erDiagram
   }
 
   MONSTERS {
-    SERIAL id PK
+    SERIAL monster_id PK
     TEXT name
     INT max_hp
     INT attack_damage
@@ -33,14 +33,14 @@ erDiagram
   }
 
   CHARACTERS {
-    SERIAL id PK
+    SERIAL character_id PK
     TEXT name
     TEXT image_name
     TEXT description
     INT base_attack
     INT base_sanity
     INT difficulty_scaling
-    TEXT backstory
+    TEXT bio
   }
 
   ROOMS {
@@ -51,7 +51,7 @@ erDiagram
   }
 
   MATCHES {
-    SERIAL id PK
+    SERIAL match_id PK
     TEXT room_code FK
     UUID host_user_id FK
     INT monster_id FK
@@ -67,7 +67,7 @@ erDiagram
   }
 
 ITEMS {
-  SERIAL id PK
+  SERIAL item_id PK
   TEXT name
   TEXT description
   TEXT image_url
