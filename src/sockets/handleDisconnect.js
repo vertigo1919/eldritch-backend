@@ -1,10 +1,11 @@
+// import { updateRoomEnded } from '../db/queries.js';
+import { ROOM_CLEANUP_DELAY_MS } from '../constants.js';
 import { rooms } from '../rooms.js';
 import { calculateAccuracy } from '../utils/calculateAccuracy.js';
 // import { saveMatch, saveMatchPlayers } from '../db/queries.js';
 
 export async function handleDisconnect(io, socket) {
   const code = socket.data.roomCode;
-  // const name = socket.data.name;
   const userId = socket.data.userId;
 
   // GUARDS
@@ -25,6 +26,17 @@ export async function handleDisconnect(io, socket) {
   rooms[code].players = rooms[code].players.filter((player) => player.userId !== userId);
 
   if (rooms[code].players.length === 0) {
+    // SAVE room ended time stamp to DB - commented out until DB is implemented
+    // try {
+    //     await updateRoomEnded(code);
+    //   } catch (err) {
+    //     console.error('DB Error: Failed to update room ended_at on empty room', { code, err });
+    //   } finally {
+    //     delete rooms[code];
+    //   }
+    //   return;
+    // }
+
     delete rooms[code];
     return;
   }
@@ -66,9 +78,18 @@ export async function handleDisconnect(io, socket) {
     //   console.error('Failed to save match to DB after player disconnect', { code, userId, err });
     // }
 
-    setTimeout(() => {
-      delete rooms[code];
-    }, 180000); // 3 min delay before deleting the room to allow for stuff to happen if it needs to
+    setTimeout(async () => {
+      //check if the room was already deleted by another process e.g. the last player left during the 3 min window
+      if (!rooms[code]) return;
+
+      try {
+        // await updateRoomEnded(code); commented out until DB is implemented
+      } catch (err) {
+        console.error('DB Error: Failed to update room ended_at on timeout', { code, err });
+      } finally {
+        delete rooms[code];
+      }
+    }, ROOM_CLEANUP_DELAY_MS); // 3 min delay before deleting the room to allow for stuff to happen if it needs to
   }
 
   // LOBBY DISCONNECTION FLOW
