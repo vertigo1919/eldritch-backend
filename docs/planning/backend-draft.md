@@ -412,9 +412,19 @@ optional:
 
 ```
 {
-  result: "victory"|"defeat",
-  monsterId, teamHpFinal, monsterHpFinal,
-  perPlayerAccuracy: [{userId, name, accuracy}]
+  "result": "defeat",
+  "monsterId": 1,
+  "teamHpFinal": 0,
+  "monsterHpFinal": 45,
+  "perPlayerAccuracy": [
+    {
+      "userId": "uuid-123",
+      "name": "Alice",
+      "accuracy": 50,
+      "correctAnswers": 5,
+      "totalQuestions": 10
+    }
+  ]
 }
 ```
 
