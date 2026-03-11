@@ -486,7 +486,7 @@ Payload:
 ```js
 {
   message: string,
-  code: 'NOT_HOST' | 'WRONG_STATUS' | 'NO_PLAYERS'
+  code: 'NOT_HOST' | 'WRONG_STATUS' | 'NOT_ENOUGH_PLAYERS'
 }
 ```
 ### submitAnswer errors
