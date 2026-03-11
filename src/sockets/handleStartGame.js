@@ -35,6 +35,7 @@ export async function handleStartGame(io, socket) {
 
   // Set initial game state
   rooms[code].roomStatus = 'in-game';
+  rooms[code].startedAt = Date.now();
   rooms[code].currentStage = 1;
   rooms[code].roundNumber = 0; // it's startNextRound()'s task to increment this of 1
 
