@@ -461,6 +461,7 @@ Event: `joinError` (server to client)
 - `NO_USER` – `"User is required"`
 - `ROOM_NOT_FOUND` – `"Room not found"`
 - `NO_CHARACTER` - `"Character selection is required"`
+- `INVALID_CHARACTER` – `"Invalid character selected"`
 - `ROOM_IN_GAME` – `"Game already started"`
 - `ROOM_ENDED` – `"Game has already ended"`
 - `ROOM_FULL` – `"Room is full"`
