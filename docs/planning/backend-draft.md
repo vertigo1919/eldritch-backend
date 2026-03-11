@@ -29,7 +29,7 @@ erDiagram
     INT max_hp
     INT attack_damage
     TEXT difficulty_level
-    TEXT image
+    TEXT image_name
   }
 
   CHARACTERS {
