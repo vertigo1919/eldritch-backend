@@ -418,14 +418,14 @@ optional:
 ### gameEnded
 
 **direction**: server to client  
-**trigger**: HP hits 0.
+**trigger**: HP hits 0, players run out of questions, or a player disconnects.
 
 **payload**:
 
 ```
 {
   "result": "defeat", // or "victory" or "abandoned"
-  "reason": "player_disconnected", // N.B reason is only sent if gameEned is caused by player disconnecting
+  "reason": "player_disconnected", // or "monster_defeated" or "out_of_questions" or "team_hp_zero"
   "monsterId": 1,
   "teamHpFinal": 0,
   "monsterHpFinal": 45,
