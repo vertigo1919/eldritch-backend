@@ -27,7 +27,7 @@ export function startNextRound(io, code) {
       name: rooms[code].monster.name,
       hp: rooms[code].monsterHp,
       maxHp: rooms[code].monster.max_hp,
-      image: rooms[code].monster.image,
+      image_name: rooms[code].monster.image_name,
     },
     question: {
       id: question.question_id,

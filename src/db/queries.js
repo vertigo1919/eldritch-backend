@@ -19,7 +19,7 @@ export async function getMonsterForStage(stageNumber) {
       name: 'Skeleton Knight',
       max_hp: 80,
       attack_damage: 10,
-      image: '',
+      image_name: '',
       difficulty_level: 'easy',
     },
     {
@@ -27,7 +27,7 @@ export async function getMonsterForStage(stageNumber) {
       name: 'Crypt Warden',
       max_hp: 120,
       attack_damage: 15,
-      image: '',
+      image_name: '',
       difficulty_level: 'medium',
     },
     {
@@ -35,7 +35,7 @@ export async function getMonsterForStage(stageNumber) {
       name: 'Eldritch Horror',
       max_hp: 160,
       attack_damage: 20,
-      image: '',
+      image_name: '',
       difficulty_level: 'hard',
     },
   ];
@@ -238,7 +238,7 @@ export async function getRandomQuestions(_quantity, _difficulty) {
 export async function saveMatch(_data) {
   // Function content: to be filled in
   // Inserts a completed game's high-level stats into the MATCHES table and returns the newly generated match_id, needed by saveMatchPlayers
-  // data format { roomCode, hostUserId, startedAt, result }
+  // data format { roomCode, hostUserId, startedAt, result } N.B. Result witll be either "defeat", "victory", "abandoned".
   // N.B. endedAt is generated automatically on record entry in the DB as well as match_id
   // called at: gameEnded, once per match or if a player disconnects and game ends early
 }
