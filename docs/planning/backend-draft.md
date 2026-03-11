@@ -314,6 +314,7 @@ Junction table. One row per player per match, storing their accuracy score. Writ
     image: "string"
   },
   question: {
+    id: 3,
     prompt: "string",
     options: { a, b, c, d }
   },
