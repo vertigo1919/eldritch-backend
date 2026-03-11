@@ -114,6 +114,7 @@ Junction table. One row per player per match, storing their accuracy score. Writ
     code: 'ABCD',
     hostUserId: 'uuid-123',
     roomStatus: 'in-game', // or "lobby" or "ended"
+    startedAt: timestap, 
     players: [
       { 
       userId: 'uuid-123', 
