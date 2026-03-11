@@ -425,7 +425,7 @@ optional:
 
 ```
 {
-  "result": "defeat",
+  "result": "defeat", // or "victory" or "abandoned"
   "reason": "player_disconnected", // N.B reason is only sent if gameEned is caused by player disconnecting
   "monsterId": 1,
   "teamHpFinal": 0,
