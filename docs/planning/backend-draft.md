@@ -54,7 +54,6 @@ erDiagram
     SERIAL match_id PK
     TEXT room_code FK
     UUID host_user_id FK
-    INT monster_id FK
     TIMESTAMPTZ started_at
     TIMESTAMPTZ ended_at
     TEXT result
