@@ -134,6 +134,7 @@ Junction table. One row per player per match, storing their accuracy score. Writ
     ],
     currentStage: 1, // 1/2/3
     roundNumber: 1, // nth round across the whole game session
+    maxTeamHp: 150,
     teamHp: 150,
     monster: {
       id: 1,
