@@ -12,34 +12,32 @@ export async function getMonsterForStage(stageNumber) {
   // Function content: to be replaced (currently returns mocks)
   // Retrieves a single monster object from the MONSTERS table corresponding to the current game stage.
   // N.B. stages for now are 1,2,3 and map to easy medium hard mosnter difficulty_level
-
-  const mockMonsters = [
-    {
-      monster_id: 1,
-      name: 'Skeleton Knight',
-      max_hp: 80,
-      attack_damage: 10,
-      image_name: '',
-      difficulty_level: 'easy',
-    },
-    {
-      monster_id: 2,
-      name: 'Crypt Warden',
-      max_hp: 120,
-      attack_damage: 15,
-      image_name: '',
-      difficulty_level: 'medium',
-    },
-    {
-      monster_id: 3,
-      name: 'Eldritch Horror',
-      max_hp: 160,
-      attack_damage: 20,
-      image_name: '',
-      difficulty_level: 'hard',
-    },
-  ];
-
+const mockMonsters = [
+  {
+    monster_id: 1,
+    name: 'Skeleton Knight',
+    max_hp: 80,
+    attack_damage: 10,
+    image_name: 'sewer_rat',
+    difficulty_level: 'easy',
+  },
+  {
+    monster_id: 2,
+    name: 'Crypt Warden',
+    max_hp: 120,
+    attack_damage: 15,
+    image_name: 'pale_slug',
+    difficulty_level: 'medium',
+  },
+  {
+    monster_id: 3,
+    name: 'Eldritch Horror',
+    max_hp: 160,
+    attack_damage: 20,
+    image_name: 'eldritch_abomination',
+    difficulty_level: 'hard',
+  },
+];
   return mockMonsters[stageNumber - 1];
 }
 
@@ -274,48 +272,47 @@ export async function getCharacter(characterId) {
   // Retrieves a specific character's stats from the CHARACTERS table using their character_id for backend game initialization.
   // we still need this (even if the charcter selection screen feteches via API) because backend needs to load character from BE not from FE
 
-  const mockCharacters = [
-    {
-      character_id: 1,
-      name: 'The Scholar',
-      image_name: 'character1.png',
-      description: 'A seeker of forbidden knowledge.',
-      bio: 'Once a professor at Miskatonic, they saw too much in the restricted archives.',
-      base_attack: 5,
-      base_sanity: 150,
-      difficulty_scaling: 1,
-    },
-    {
-      character_id: 2,
-      name: 'The Investigator',
-      image_name: 'character2.png',
-      description: 'Used to dealing with the unknown.',
-      bio: 'A former private eye who specializes in missing persons cases that "dont exist."',
-      base_attack: 10,
-      base_sanity: 120,
-      difficulty_scaling: 1,
-    },
-    {
-      character_id: 3,
-      name: 'The Occultist',
-      image_name: 'character3.png',
-      description: 'Dabbles in the dark arts.',
-      bio: 'They realized early on that to fight the darkness, one must understand its language.',
-      base_attack: 15,
-      base_sanity: 90,
-      difficulty_scaling: 2,
-    },
-    {
-      character_id: 4,
-      name: 'The Veteran',
-      image_name: 'character4.png',
-      description: 'Hardened by past conflicts.',
-      bio: 'Survived a trench assault that defied the laws of physics. They haven’t slept since.',
-      base_attack: 20,
-      base_sanity: 70,
-      difficulty_scaling: 2,
-    },
-  ];
-
+const mockCharacters = [
+  {
+    character_id: 1,
+    name: 'Denis McCload',
+    image_name: 'Denis',
+    description: 'A seeker of forbidden knowledge.',
+    bio: 'I lost everything. My family, my home, my hope. I will not lose my will to fight.',
+    base_attack: 5,
+    base_sanity: 150,
+    difficulty_scaling: 1,
+  },
+  {
+    character_id: 2,
+    name: 'GreyStaff',
+    image_name: 'GreyStaff',
+    description: 'Used to dealing with the unknown.',
+    bio: 'Feel my power. I am the great wizard. I am not delusional.',
+    base_attack: 10,
+    base_sanity: 120,
+    difficulty_scaling: 1,
+  },
+  {
+    character_id: 3,
+    name: 'Patris Deathstare',
+    image_name: 'Patris',
+    description: 'Dabbles in the dark arts.',
+    bio: 'I grew up in the cult that made this. Now I must end it all.',
+    base_attack: 15,
+    base_sanity: 90,
+    difficulty_scaling: 2,
+  },
+  {
+    character_id: 4,
+    name: 'Unknown',
+    image_name: 'Unknown',
+    description: 'Hardened by past conflicts.',
+    bio: 'Kill... Kill... KILL THEM ALL!',
+    base_attack: 20,
+    base_sanity: 70,
+    difficulty_scaling: 2,
+  },
+];
   return mockCharacters.find((c) => c.character_id === Number(characterId));
 }
