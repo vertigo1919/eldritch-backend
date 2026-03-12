@@ -22,7 +22,7 @@ build/
 .npm
 
 # dotenv environment variables
-.env
+.env*
 .env.local
 .env.*.local
 

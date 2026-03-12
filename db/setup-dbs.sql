@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS eldritch;
+CREATE DATABASE eldritch;
+
+DROP DATABASE IF EXISTS eldritch_test;
+CREATE DATABASE eldritch_test;

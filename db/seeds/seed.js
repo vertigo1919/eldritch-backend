@@ -1,0 +1,160 @@
+const db = require('../connection');
+const format = require('pg-format');
+const formatQuestions = require('../utils/formatQuestionData');
+
+async function seed({ questionData, monsterData, characterData }) {
+  await db.query(`DROP TABLE IF EXISTS match_players`);
+  await db.query(`DROP TABLE IF EXISTS matches`);
+  await db.query(`DROP TABLE IF EXISTS rooms`);
+  await db.query(`DROP TABLE IF EXISTS users`);
+  await db.query(`DROP TABLE IF EXISTS characters`);
+  await db.query(`DROP TABLE IF EXISTS monsters`);
+  await db.query(`DROP TABLE IF EXISTS questions`);
+  await db.query(`DROP TABLE IF EXISTS items`);
+
+  await db.query(`
+        CREATE TABLE items (
+        item_id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        image_url TEXT,
+        type TEXT NOT NULL,
+        boost_attack INT DEFAULT 0,
+        boost_defence INT DEFAULT 0,
+        boost_sanity INT DEFAULT 0
+        )`);
+
+  await db.query(`
+        CREATE TABLE questions (
+        question_id SERIAL PRIMARY KEY,
+        prompt TEXT NOT NULL,
+        option_a TEXT NOT NULL,
+        option_b TEXT NOT NULL,
+        option_c TEXT NOT NULL,
+        option_d TEXT NOT NULL,
+        correct_option TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        category TEXT NOT NULL
+        )`);
+
+  await db.query(`
+        CREATE TABLE monsters (
+        monster_id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        max_hp INT NOT NULL,
+        attack_damage INT NOT NULL,
+        difficulty_level TEXT NOT NULL,
+        image_url TEXT
+        )`);
+
+  await db.query(`
+        CREATE TABLE characters (
+        character_id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        image_name TEXT,
+        bio TEXT,
+        base_attack INT NOT NULL,
+        base_sanity INT NOT NULL,
+        difficulty_scaling INT
+        )`);
+
+  await db.query(`
+        CREATE TABLE users (
+        user_id UUID DEFAULT gen_random_uuid(),
+        display_name TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        
+        )`);
+
+  await db.query(`
+        CREATE TABLE rooms (
+        code TEXT PRIMARY KEY,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+  await db.query(`
+        CREATE TABLE matches (
+        match_id SERIAL PRIMARY KEY,
+        room_code TEXT NOT NULL REFERENCES rooms(room_code),
+        host_user_id INT REFERENCES users(user_id),
+        monster_id INT REFERENCES monsters (monster_id),
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        result TEXT
+        )`);
+
+  await db.query(`
+        CREATE TABLE match_players (
+        match_id SERIAL PRIMARY KEY REFERENCES matches(match_id),
+        user_id UUID REFERENCES users(user_id),
+        accuracy NUMERIC 
+        )`);
+
+  const formattedQuestions = formatQuestions(questionData).map((question) => [
+    question.prompt,
+    question.option_a,
+    question.option_b,
+    question.option_c,
+    question.option_d,
+    question.correct_option,
+    question.difficulty,
+    question.category,
+  ]);
+  await db.query(
+    format(
+      `INSERT INTO questions(
+prompt,
+option_a,
+option_b,
+option_c,
+option_d,
+correct_option,
+difficulty,
+category) VALUES %L`,
+      formattedQuestions
+    )
+  );
+
+  const formattedMonsters = monsterData.map((monster) => [
+    monster.monster_name,
+    monster.max_hp,
+    monster.attack_dmg,
+    monster.difficulty,
+    monster.img_name,
+  ]);
+  await db.query(
+    format(
+      `INSERT INTO monsters(monster_name,
+max_hp,
+attack_damage,
+difficulty,
+img_name) VALUES %L`,
+      formattedMonsters
+    )
+  );
+  const formattedCharacters = characterData.map((char) => [
+    char.name,
+    char.image_name,
+    char.bio,
+    char.base_attack,
+    char.base_sanity,
+    char.difficulty_scaling,
+  ]);
+  await db.query(
+    format(
+      `INSERT INTO characters(
+name,
+image_name,
+bio,
+base_attack,
+base_sanity,
+difficulty_scaling) VALUES %L`,
+      formattedCharacters
+    )
+  );
+}
+
+module.exports = seed;
