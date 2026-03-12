@@ -1,8 +1,7 @@
-// import { updateRoomEnded } from '../db/queries.js';
+import { updateRoomEnded, saveMatchPlayers, saveMatch } from '../db/queries.js';
 import { ROOM_CLEANUP_DELAY_MS } from '../constants.js';
 import { rooms } from '../rooms.js';
 import { calculateAccuracy } from '../utils/calculateAccuracy.js';
-// import { saveMatch, saveMatchPlayers } from '../db/queries.js';
 
 export async function handleDisconnect(io, socket) {
   const code = socket.data.roomCode;
@@ -26,18 +25,13 @@ export async function handleDisconnect(io, socket) {
   rooms[code].players = rooms[code].players.filter((player) => player.userId !== userId);
 
   if (rooms[code].players.length === 0) {
-    // SAVE room ended time stamp to DB - commented out until DB is implemented
-    // try {
-    //     await updateRoomEnded(code);
-    //   } catch (err) {
-    //     console.error('DB Error: Failed to update room ended_at on empty room', { code, err });
-    //   } finally {
-    //     delete rooms[code];
-    //   }
-    //   return;
-    // }
-
-    delete rooms[code];
+    try {
+      await updateRoomEnded(code);
+    } catch (err) {
+      console.error('DB Error: Failed to update room ended_at on empty room', { code, err });
+    } finally {
+      delete rooms[code];
+    }
     return;
   }
 
@@ -59,31 +53,33 @@ export async function handleDisconnect(io, socket) {
 
     io.to(code).emit('gameEnded', gameEndedPayload);
 
-    // SAVE RESULTS TO DB - commented out until DB is operational
-    // try {
-    //   const match_id = await saveMatch({
-    //     roomCode: code,
-    //     hostUserId: rooms[code].hostUserId,
-    //     startedAt: rooms[code].startedAt,
-    //     result: 'abandoned',
-    //   });
-    //   await saveMatchPlayers(
-    //     perPlayerAccuracy.map((p) => ({
-    //       match_id: match_id,
-    //       user_id: p.userId,
-    //       accuracy: p.accuracy,
-    //     }))
-    //   );
-    // } catch (err) {
-    //   console.error('Failed to save match to DB after player disconnect', { code, userId, err });
-    // }
+    try {
+      const matchResult = await saveMatch({
+        roomCode: code,
+        hostUserId: rooms[code].hostUserId,
+        startedAt: rooms[code].startedAt,
+        result: 'abandoned',
+      });
+
+      const extractedMatchId = matchResult[0].match_id;
+
+      await saveMatchPlayers(
+        perPlayerAccuracy.map((p) => ({
+          match_id: extractedMatchId,
+          user_id: p.userId,
+          accuracy: p.accuracy,
+        }))
+      );
+    } catch (err) {
+      console.error('Failed to save match to DB after player disconnect', { code, userId, err });
+    }
 
     setTimeout(async () => {
       //check if the room was already deleted by another process e.g. the last player left during the 3 min window
       if (!rooms[code]) return;
 
       try {
-        // await updateRoomEnded(code); commented out until DB is implemented
+        await updateRoomEnded(code);
       } catch (err) {
         console.error('DB Error: Failed to update room ended_at on timeout', { code, err });
       } finally {

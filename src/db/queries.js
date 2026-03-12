@@ -20,7 +20,7 @@ export async function getMonsterForStage(stageNumber) {
 
   const { rows } = await db.query(
     `SELECT monster_id, name, max_hp, attack_damage, image_name 
-     FROM monsters WHERE difficulty_level = $1 LIMIT 1`,
+     FROM monsters WHERE difficulty_level = $1 ORDER BY RANDOM() LIMIT 1`,
     [difficulty]
   );
   return rows[0];
@@ -37,22 +37,16 @@ export async function getRandomQuestions(quantity, difficulty) {
   return body;
 }
 
-export async function saveMatch({ roomCode, hostUserId, monsterId, startedAt, result }) {
-  // Inserts a completed game's high-level stats into the MATCHES table and returns the newly generated match_id, needed by saveMatchPlayers
-  // data format { roomCode, hostUserId, startedAt, result }
-  // N.B. Result witll be either "defeat", "victory", "abandoned".
-  // N.B. endedAt is generated automatically on record entry in the DB as well as match_id
-  // called at: gameEnded, once per match or if a player disconnects and game ends early
-  await db.query(
-    `INSERT INTO matches (room_code, host_user_id, monster_id, started_at, result, ended_at) 
-     VALUES ($1, $2, $3, TO_TIMESTAMP($4 / 1000.0), $5, CURRENT_TIMESTAMP)`,
-    [roomCode, hostUserId, monsterId, startedAt, result]
+export async function saveMatch({ roomCode, hostUserId, startedAt, result }) {
+  // Inserts a completed game's high-level stats into the MATCHES table and returns the newly generated match_id
+  const response = await db.query(
+    `INSERT INTO matches (room_code, host_user_id, started_at, result, ended_at) 
+     VALUES ($1, $2, TO_TIMESTAMP($3 / 1000.0), $4, CURRENT_TIMESTAMP)
+     RETURNING match_id`,
+    [roomCode, hostUserId, startedAt, result]
   );
 
-  const response = await db.query(`SELECT match_id FROM matches ORDER BY match_id DESC LIMIT 1`);
-
-  const body = response.rows;
-  return body;
+  return response.rows;
 }
 
 export async function saveMatchPlayers(playersArray) {

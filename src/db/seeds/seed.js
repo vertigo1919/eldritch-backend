@@ -81,7 +81,6 @@ async function seed({ questionData, monsterData, characterData }) {
         match_id SERIAL PRIMARY KEY,
         room_code TEXT NOT NULL REFERENCES rooms(code),
         host_user_id TEXT REFERENCES users(user_id),
-        monster_id INT REFERENCES monsters (monster_id),
         started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         ended_at TIMESTAMP,
         result TEXT

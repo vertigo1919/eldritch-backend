@@ -1,6 +1,12 @@
 import { rooms } from '../rooms.js';
-import { getMonsterForStage, getRandomQuestions } from '../db/queries.js';
-// import { saveMatch, saveMatchPlayers, updatedRommEnded } from '../db/queries.js';
+import {
+  getMonsterForStage,
+  getRandomQuestions,
+  saveMatch,
+  saveMatchPlayers,
+  updateRoomEnded,
+} from '../db/queries.js';
+
 import {
   QUESTIONS_PER_MONSTER,
   DIFFICULTY_MAP,
@@ -109,31 +115,32 @@ export async function resolveRound(io, code) {
 
     io.to(code).emit('gameEnded', gameEndedPayload);
 
-    // Save match to DB - to enable once queries.js is connected to DB
-    // try {
-    //   const match_id = await saveMatch({
-    //     roomCode: code,
-    //     hostUserId: rooms[code].hostUserId,
-    //     startedAt: rooms[code].startedAt,
-    //     result: result,
-    //   });
-    //   await saveMatchPlayers(
-    //     perPlayerAccuracyArray.map((p) => ({
-    //       match_id: match_id,
-    //       user_id: p.userId,
-    //       accuracy: p.accuracy,
-    //     }))
-    //   );
-    // } catch (err) {
-    //   console.error('Failed to save match to DB', { code, result, err });
-    // }
+    try {
+      const matchResult = await saveMatch({
+        roomCode: code,
+        hostUserId: rooms[code].hostUserId,
+        startedAt: rooms[code].startedAt,
+        result: result,
+      });
+
+      const match_id = matchResult[0].match_id;
+
+      await saveMatchPlayers(
+        perPlayerAccuracyArray.map((p) => ({
+          match_id: match_id,
+          user_id: p.userId,
+          accuracy: p.accuracy,
+        }))
+      );
+    } catch (err) {
+      console.error('Failed to save match to DB', { code, result, err });
+    }
 
     setTimeout(async () => {
       if (!rooms[code]) return;
 
       try {
-        // COMMENTED OUT UNTIL DB is FUNCTIONAL
-        // await updateRoomEnded(code);
+        await updateRoomEnded(code);
       } catch (err) {
         console.error('DB Error: Failed to update room ended_at on timeout', { code, err });
       } finally {

@@ -41,6 +41,7 @@ export function startNextRound(io, code) {
     },
     gameState: {
       teamHp: rooms[code].teamHp,
+      maxTeamHp: rooms[code].maxTeamHp,
       roundNumber: rooms[code].roundNumber,
       roundDeadline: rooms[code].roundDeadline,
     },

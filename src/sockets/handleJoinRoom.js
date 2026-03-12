@@ -1,4 +1,4 @@
-//import { saveUser, createRoomRecord } from '../db/queries.js';
+import { saveUser, createRoomRecord } from '../db/queries.js';
 import { generateRoomCode } from '../utils/generateRoomCode.js';
 import { rooms } from '../rooms.js';
 import { MAX_PLAYERS } from '../constants.js';
@@ -42,7 +42,7 @@ export async function handleJoinRoom(io, socket, payload) {
   }
 
   try {
-    // await saveUser({ user_id: userId, display_name: name }); placeholder call
+    await saveUser({ user_id: userId, display_name: name });
   } catch (err) {
     console.error('DB Error:', err);
     return socket.emit('joinError', { message: 'Could not write to DB', code: 'SERVER_ERROR' });
@@ -60,7 +60,7 @@ export async function handleJoinRoom(io, socket, payload) {
     }
 
     try {
-      //   await createRoomRecord(code); placeholder call
+      await createRoomRecord(code, userId);
     } catch {
       socket.emit('joinError', {
         message: 'Unable to create room record in DB',

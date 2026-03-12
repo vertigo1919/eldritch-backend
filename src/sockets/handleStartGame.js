@@ -40,10 +40,13 @@ export async function handleStartGame(io, socket) {
   rooms[code].roundNumber = 0; // it's startNextRound()'s task to increment this of 1
 
   // calculate and set team HP
-  rooms[code].teamHp = rooms[code].players.reduce((teamHP, player) => {
+  const totalSanity = rooms[code].players.reduce((teamHP, player) => {
     teamHP += player.character.base_sanity;
     return teamHP;
   }, 0);
+
+  rooms[code].teamHp = totalSanity;
+  rooms[code].maxTeamHp = totalSanity;
 
   // Load first monster
   rooms[code].monster = await getMonsterForStage(1);

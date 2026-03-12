@@ -4,7 +4,7 @@ export const characters = [
     image_name: 'denis_mcCload',
     bio: "Name: Denis McCload\nAge:42\nRace: Human\nBackstory: I lost everything\nMy family, my home, my hope.\nI won't lose my will to fight",
     base_attack: 5,
-    base_sanity: 20,
+    base_sanity: 120,
     difficulty_scaling: 0,
   },
   {
@@ -13,7 +13,7 @@ export const characters = [
 
     bio: "Name: Greystaff\nAge:72\nRace: Wizard\nBackstory: Feel my power\nI am the great wizard\nI'm not delusional",
     base_attack: 5,
-    base_sanity: 20,
+    base_sanity: 120,
     difficulty_scaling: 0,
   },
   {
@@ -21,7 +21,7 @@ export const characters = [
     image_name: 'patris_deathstare',
     bio: 'Name: Patris Deathstare\nAge:32\nRace: Human\nBackstory: It is done.\nI grew up in the cult\nthat made this.\nNow I must end it all',
     base_attack: 5,
-    base_sanity: 20,
+    base_sanity: 120,
     difficulty_scaling: 0,
   },
   {
