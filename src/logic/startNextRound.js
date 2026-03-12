@@ -3,6 +3,11 @@ import { resolveRound } from './resolveRound.js';
 import { ROUND_DURATION_MS } from '../constants.js';
 
 export function startNextRound(io, code) {
+  if (!rooms[code]) {
+    console.warn("startNextRound called for missing room:", code);
+    return;
+  }
+
   rooms[code].roundNumber++;
   rooms[code].currentQuestionIndex++;
 
@@ -11,15 +16,17 @@ export function startNextRound(io, code) {
   rooms[code].currentQuestionId = questionId;
 
   rooms[code].answers = {};
-
-  // start timer: we need roundDeadline property for FE to display countdown and timeout to know when to resolveRound()
   rooms[code].roundDeadline = Date.now() + ROUND_DURATION_MS;
 
   rooms[code].timerId = setTimeout(() => {
+    if (!rooms[code]) {
+      console.warn("Timer fired for missing room:", code);
+      return;
+    }
+
     resolveRound(io, code);
   }, ROUND_DURATION_MS);
 
-  // emit roundStarted - NB we must not send the correct answer, it stays in backend
   const question = rooms[code].questions[currentQuestionIndex];
 
   const roundStartedPayload = {
@@ -46,5 +53,5 @@ export function startNextRound(io, code) {
     },
   };
 
-  io.to(code).emit('roundStarted', roundStartedPayload);
+  io.to(code).emit("roundStarted", roundStartedPayload);
 }
