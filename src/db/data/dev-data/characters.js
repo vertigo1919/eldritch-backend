@@ -1,4 +1,4 @@
-module.exports = [
+export const characters = [
   {
     name: 'Denis McCload',
     image_name: 'denis_mcCload',

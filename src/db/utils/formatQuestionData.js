@@ -24,4 +24,4 @@ function formatQuestions(data) {
   return newQuestionArray;
 }
 
-module.exports = formatQuestions;
+export { formatQuestions };

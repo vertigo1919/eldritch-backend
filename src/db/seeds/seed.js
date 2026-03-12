@@ -1,6 +1,7 @@
-const db = require('../connection');
-const format = require('pg-format');
-const formatQuestions = require('../utils/formatQuestionData');
+import { db } from '../connection.js';
+
+import format from 'pg-format';
+import { formatQuestions } from '../utils/formatQuestionData.js';
 
 async function seed({ questionData, monsterData, characterData }) {
   await db.query(`DROP TABLE IF EXISTS match_players`);
@@ -17,10 +18,10 @@ async function seed({ questionData, monsterData, characterData }) {
         item_id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
-        image_url TEXT,
+        image_name TEXT,
         type TEXT NOT NULL,
         boost_attack INT DEFAULT 0,
-        boost_defence INT DEFAULT 0,
+        boost_defense INT DEFAULT 0,
         boost_sanity INT DEFAULT 0
         )`);
 
@@ -44,7 +45,7 @@ async function seed({ questionData, monsterData, characterData }) {
         max_hp INT NOT NULL,
         attack_damage INT NOT NULL,
         difficulty_level TEXT NOT NULL,
-        image_url TEXT
+        image_name TEXT
         )`);
 
   await db.query(`
@@ -60,9 +61,9 @@ async function seed({ questionData, monsterData, characterData }) {
 
   await db.query(`
         CREATE TABLE users (
-        user_id UUID DEFAULT gen_random_uuid(),
+        user_id TEXT PRIMARY KEY,
         display_name TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         
         )`);
@@ -70,27 +71,28 @@ async function seed({ questionData, monsterData, characterData }) {
   await db.query(`
         CREATE TABLE rooms (
         code TEXT PRIMARY KEY,
+        host_user_id TEXT REFERENCES users(user_id),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        ended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ended_at TIMESTAMP
         )`);
 
   await db.query(`
         CREATE TABLE matches (
         match_id SERIAL PRIMARY KEY,
-        room_code TEXT NOT NULL REFERENCES rooms(room_code),
-        host_user_id INT REFERENCES users(user_id),
+        room_code TEXT NOT NULL REFERENCES rooms(code),
+        host_user_id TEXT REFERENCES users(user_id),
         monster_id INT REFERENCES monsters (monster_id),
         started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        ended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ended_at TIMESTAMP,
         result TEXT
         )`);
 
   await db.query(`
         CREATE TABLE match_players (
-        match_id SERIAL PRIMARY KEY REFERENCES matches(match_id),
-        user_id UUID REFERENCES users(user_id),
-        accuracy NUMERIC 
+        match_id INT REFERENCES matches(match_id),
+        user_id TEXT REFERENCES users(user_id),
+        accuracy NUMERIC,
+        PRIMARY KEY (match_id, user_id)
         )`);
 
   const formattedQuestions = formatQuestions(questionData).map((question) => [
@@ -127,11 +129,11 @@ category) VALUES %L`,
   ]);
   await db.query(
     format(
-      `INSERT INTO monsters(monster_name,
+      `INSERT INTO monsters(name,
 max_hp,
 attack_damage,
-difficulty,
-img_name) VALUES %L`,
+difficulty_level,
+image_name) VALUES %L`,
       formattedMonsters
     )
   );
@@ -157,4 +159,4 @@ difficulty_scaling) VALUES %L`,
   );
 }
 
-module.exports = seed;
+export { seed };

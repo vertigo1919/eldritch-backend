@@ -1,4 +1,4 @@
-module.exports = [
+export const questions = [
   {
     type: 'multiple',
     difficulty: 'easy',

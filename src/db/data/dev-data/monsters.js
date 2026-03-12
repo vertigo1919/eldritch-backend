@@ -1,4 +1,4 @@
-module.exports = [
+export const monsters = [
   {
     monster_name: 'Sewer Beast',
     max_hp: 100,

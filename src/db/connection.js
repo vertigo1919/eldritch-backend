@@ -1,8 +1,15 @@
-const { Pool } = require('pg');
+import pg from 'pg';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const { Pool } = pg;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const ENV = process.env.NODE_ENV || 'development';
 
-require('dotenv').config({ path: `${__dirname}/../.env.${ENV}` });
+dotenv.config({ path: `${__dirname}/../../.env.${ENV}` });
 
 if (!process.env.PGDATABASE && !process.env.DATABASE_URL) {
   throw new Error('PGDATABASE or DATABASE_URL not set');
@@ -22,4 +29,4 @@ if (ENV === 'production') {
 
 const db = new Pool(config);
 
-module.exports = db;
+export { db };
