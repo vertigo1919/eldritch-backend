@@ -101,7 +101,7 @@ export const questions = [
     category: 'General Knowledge',
     question: 'Which candy is NOT made by Mars?',
     correct_answer: 'Almond Joy',
-    incorrect_answers: ["M&amp;M's", 'Twix', 'Snickers'],
+    incorrect_answers: ["M&M's", 'Twix', 'Snickers'],
   },
   {
     type: 'multiple',
@@ -310,8 +310,7 @@ export const questions = [
     type: 'multiple',
     difficulty: 'easy',
     category: 'General Knowledge',
-    question:
-      'The New York Times slogan is, &ldquo;All the News That&rsquo;s Fit to&hellip;&rdquo;',
+    question: "The New York Times slogan is, 'All the News That's Fit to...'",
     correct_answer: 'Print',
     incorrect_answers: ['Digest', 'Look', 'Read'],
   },
@@ -328,7 +327,7 @@ export const questions = [
     type: 'multiple',
     difficulty: 'easy',
     category: 'General Knowledge',
-    question: 'What country does sushi &amp; karaoke come from?',
+    question: 'What country does sushi & karaoke come from?',
     correct_answer: 'Japan',
     incorrect_answers: ['China', 'South Korea', 'Vietnam'],
   },
@@ -337,7 +336,7 @@ export const questions = [
     difficulty: 'easy',
     category: 'General Knowledge',
     question:
-      'The &ldquo;fairy&rdquo; type made it&rsquo;s debut in which generation of the Pokemon core series games?',
+      'The "fairy" type made it\'s debut in which generation of the Pokemon core series games?',
     correct_answer: '6th',
     incorrect_answers: ['2nd', '7th', '4th'],
   },
@@ -414,7 +413,7 @@ export const questions = [
     incorrect_answers: [
       'Ojos del Salado, Argentina/Chile border',
       'Monte Pissis, Argentina',
-      'Huascar&aacute;n, Peru',
+      'Huáscar, Peru',
     ],
   },
   {
@@ -543,7 +542,7 @@ export const questions = [
     type: 'multiple',
     difficulty: 'medium',
     category: 'General Knowledge',
-    question: 'The website "Shut Up &amp; Sit Down" reviews which form of media?',
+    question: 'The website "Shut Up & Sit Down" reviews which form of media?',
     correct_answer: 'Board Games',
     incorrect_answers: ['Television Shows', 'Video Games', 'Films'],
   },
@@ -715,7 +714,7 @@ export const questions = [
     correct_answer: 'Petronas Twin Towers, Malaysia',
     incorrect_answers: [
       'Zifeng Tower, China',
-      'Trump Intl. Hotel &amp; Tower, United States',
+      'Trump Intl. Hotel & Tower, United States',
       'Al Hamra Tower, Kuwait',
     ],
   },
@@ -748,8 +747,8 @@ export const questions = [
     difficulty: 'medium',
     category: 'General Knowledge',
     question: 'What is the German word for "spoon"?',
-    correct_answer: 'L&ouml;ffel',
-    incorrect_answers: ['Gabel', 'Messer', 'Essst&auml;bchen'],
+    correct_answer: 'Löffel',
+    incorrect_answers: ['Gabel', 'Messer', 'Essstäbchen'],
   },
   {
     type: 'multiple',
@@ -919,7 +918,7 @@ export const questions = [
     category: 'General Knowledge',
     question: 'Which one of these Swedish companies was founded in 1943?',
     correct_answer: 'IKEA',
-    incorrect_answers: ['H &amp; M', 'Lindex', 'Clas Ohlson'],
+    incorrect_answers: ['H & M', 'Lindex', 'Clas Ohlson'],
   },
   {
     type: 'multiple',
@@ -972,9 +971,9 @@ export const questions = [
     difficulty: 'hard',
     category: 'General Knowledge',
     question:
-      'Where in La Coru&ntilde;a (Spain) is the headquarters of "Inditex", the biggest fashion group in the world?',
+      'Where in La Coruña (Spain) is the headquarters of "Inditex", the biggest fashion group in the world?',
     correct_answer: 'Arteijo',
-    incorrect_answers: ['Sanjenjo', 'Mug&iacute;a', '&Oacute;rdenes'],
+    incorrect_answers: ['Sanjenjo', 'Mugía', 'Órdenes'],
   },
   {
     type: 'multiple',
@@ -1072,7 +1071,7 @@ export const questions = [
     difficulty: 'hard',
     category: 'General Knowledge',
     question:
-      'In the fictional SCP universe what &ldquo;Object Class&rdquo; is given to SCP&rsquo;s that cannot be contained.',
+      "In the fictional SCP universe what 'Object Class' is given to SCP's that cannot be contained.",
     correct_answer: 'Apollyon',
     incorrect_answers: ['Thaumiel', 'Keter-Thaumiel', 'Esoteric/Narrative Classes'],
   },
@@ -1168,7 +1167,7 @@ export const questions = [
     question:
       "Which church's interior in Vatican City was designed in 1503 by renaissance architects including Bramante, Michelangelo and Bernini?",
     correct_answer: "St. Peter's Basilica",
-    incorrect_answers: ['Catania Cathedral', 'St. Mark&rsquo;s Basilica', 'The Duomo of Florence'],
+    incorrect_answers: ['Catania Cathedral', "St. Mark's Basilica", 'The Duomo of Florence'],
   },
   {
     type: 'multiple',
