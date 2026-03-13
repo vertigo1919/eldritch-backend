@@ -471,6 +471,8 @@ Event: `joinError` (server to client)
 - `ROOM_ENDED` – `"Game has already ended"`
 - `ROOM_FULL` – `"Room is full"`
 - `SERVER_ERROR` - `"A server error occurred"`
+- `ALREADY_IN_THIS_ROOM` - `You are already in this room.`
+- `IN_DIFFERENT_ROOM` - `You are already playing in room [room code]. Please finish or leave that game first.`
   
 Payload format: 
 ```js
