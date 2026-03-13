@@ -14,4 +14,4 @@ npm run seed
 npm run dev
 ```
 
-If initialised succesfully, you will see the backend is accesible at `http://localhost:300`
+If initialised succesfully, you will see the backend is accesible at `http://localhost:3000`
