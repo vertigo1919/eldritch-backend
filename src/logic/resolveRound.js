@@ -14,7 +14,6 @@ import {
   ROOM_CLEANUP_DELAY_MS,
   MONSTER_DAMAGE_ADJUSTMENT_FACTOR,
 } from '../constants.js';
-import { startNextRound } from './startNextRound.js';
 import { calculateAccuracy } from '../utils/calculateAccuracy.js';
 
 export async function resolveRound(io, code) {
@@ -192,16 +191,14 @@ export async function resolveRound(io, code) {
       nextMonster: rooms[code].monster,
       nextStage: rooms[code].currentStage,
     };
-
+    rooms[code].waitingForHostReady = true;
     io.to(code).emit('roundResult', roundResultNextStagePayload);
-
-    startNextRound(io, code);
   }
 
   // 3)  NEXT ROUND FLOW
   else {
     rooms[code].answers = {};
+    rooms[code].waitingForHostReady = true;
     io.to(code).emit('roundResult', baseResultPayload);
-    startNextRound(io, code);
   }
 }
