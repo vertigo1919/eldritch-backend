@@ -9,6 +9,10 @@ erDiagram
     TEXT display_name
     TIMESTAMPTZ created_at
     TIMESTAMPTZ last_seen
+    INT total_questions_attempted
+    INT hard_questions_correct
+    INT medium_questions_correct
+    INT easy_questions_correct
   }
 
   QUESTIONS {
