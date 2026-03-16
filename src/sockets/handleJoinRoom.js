@@ -10,6 +10,8 @@ export async function handleJoinRoom(io, socket, payload) {
 
   let { name, roomCode: incomingCode, userId, characterId } = payload;
 
+  let code = incomingCode?.trim().toUpperCase();
+
   if (!name) {
     socket.emit('joinError', { message: 'Name is required', code: 'NO_NAME' });
     return;
@@ -22,6 +24,30 @@ export async function handleJoinRoom(io, socket, payload) {
 
   if (!characterId) {
     socket.emit('joinError', { message: 'Character selection is required', code: 'NO_CHARACTER' });
+    return;
+  }
+
+  let existingRoomCodeFound = null;
+  for (const key in rooms) {
+    const isUserInThisRoom = rooms[key].players.some((player) => player.userId === userId);
+    if (isUserInThisRoom) {
+      existingRoomCodeFound = key;
+      break;
+    }
+  }
+
+  if (existingRoomCodeFound) {
+    if (code === existingRoomCodeFound) {
+      socket.emit('joinError', {
+        message: 'You are already in this room.',
+        code: 'ALREADY_IN_THIS_ROOM',
+      });
+    } else {
+      socket.emit('joinError', {
+        message: `You are already playing in room ${existingRoomCodeFound}. Please finish or leave that game first.`,
+        code: 'IN_DIFFERENT_ROOM',
+      });
+    }
     return;
   }
 
@@ -38,7 +64,10 @@ export async function handleJoinRoom(io, socket, payload) {
     }
   } catch (err) {
     console.error('DB Error:', err);
-    return socket.emit('joinError', { message: 'Could not fetch character', code: 'SERVER_ERROR' });
+    return socket.emit('joinError', {
+      message: 'Could not fetch character',
+      code: 'SERVER_ERROR',
+    });
   }
 
   try {
@@ -47,7 +76,6 @@ export async function handleJoinRoom(io, socket, payload) {
     console.error('DB Error:', err);
     return socket.emit('joinError', { message: 'Could not write to DB', code: 'SERVER_ERROR' });
   }
-  let code = incomingCode?.trim().toUpperCase();
 
   const task = code ? 'joinRoom' : 'createRoom';
 
@@ -120,6 +148,7 @@ export async function handleJoinRoom(io, socket, payload) {
       });
       return;
     }
+
     rooms[code].players.push({
       userId: userId,
       socketId: socket.id,

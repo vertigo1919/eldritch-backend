@@ -7,9 +7,10 @@
   "scripts": {
     "setup-dbs": "psql -f ./src/db/setup-dbs.sql",
     "seed": "node ./src/db/seeds/run-seed.js",
+    "seed-remote": "NODE_ENV=production node ./src/db/seeds/run-seed.js",
     "test": "jest --runInBand",
     "dev": "node src/server.js",
-    "start": "nodemon src/server.js"
+    "start": "node src/server.js"
   },
   "author": "multiple",
   "license": "MIT",

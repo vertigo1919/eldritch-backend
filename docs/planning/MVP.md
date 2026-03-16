@@ -2,8 +2,7 @@
 
 ### **Goal**
 
-Build a real-time 4-player quiz combat prototype where all players answer the same question simultaneously and the team wins or loses based on shared HP.
-
+Build a real-time 4-player quiz combat prototype where all players answer the same question simultaneously and the team progresses through three monsters in sequence, each using increasing question difficulty, while sharing a team HP pool.
 ---
 
 ## **Player Flow**
@@ -22,9 +21,13 @@ Build a real-time 4-player quiz combat prototype where all players answer the sa
    - Players submit an answer
 
    - Round resolves simultaneously
+   
+   -   If monster HP reaches 0:
+      -   Load the next monster
+      -   Continue battle
 
 5. End:
-   - **Victory** if monster HP reaches 0
+   - **Victory** if all 3 monsters are defeated
 
    - **Game Over** if team HP reaches 0
 
@@ -34,14 +37,40 @@ Build a real-time 4-player quiz combat prototype where all players answer the sa
 
 - Room size: **1–4 players**
 
-- Shared Team HP: single pool for the whole room
+- Shared Team HP: single pool for the whole room. It is calculated at the start of the game by summing the base stats of all selected characters in the room.
 
 - Each round uses the same question for all players
 
+- Questions cannot repeat within a single run.
+
 - Round timer: **10–15 seconds**
-  - No answer \= wrong
+
+-  No answer \= wrong
 
 - Next round begins with a new question until game ends
+
+- Correct answer → Monster takes damage
+
+- Wrong answer or no answer → Team takes damage
+
+- Round resolves when:
+   - All players have submitted an answer, OR
+   - The timer expires
+
+---
+
+### Monster Progression (MVP)
+
+- The game includes 3 monsters preloaded in the database.
+   -  Monsters are fought sequentially:
+      -  Monster 1
+      -  Monster 2
+      -  Monster 3
+
+    Each monster loads questions of increasing difficulty:
+      - Monster 1 → Level 1 (easy) questions
+      - Monster 2 → Level 2 (medium) questions
+      - Monster 3 → Level 3 (hard) questions
 
 ---
 
@@ -71,8 +100,7 @@ Build a real-time 4-player quiz combat prototype where all players answer the sa
 
 - Content source:
   - Question bank (seed JSON or DB table)
-
-  - Single monster config (DB)
+  - Monster database (3 monsters for MVP with increasing difficulty)
   - Character database
   - Item database
 
@@ -123,7 +151,7 @@ Build a real-time 4-player quiz combat prototype where all players answer the sa
 - Minimal assets:
   - 1 background
 
-  - 1 monster image
+  - 3 monster images
 
   - Basic UI icons optional
 
@@ -138,3 +166,6 @@ Build a real-time 4-player quiz combat prototype where all players answer the sa
 - Answers resolve simultaneously with correct HP changes
 
 - Game ends with Victory or Game Over and all clients transition correctly
+
+- Players must defeat 3 monsters in sequence to win
+- Questions increase in difficulty with each monster
