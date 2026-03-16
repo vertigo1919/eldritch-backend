@@ -152,12 +152,12 @@ export async function handleJoinRoom(io, socket, payload) {
     roomStatus: 'lobby',
   };
 
-  console.log('player joined room', {
-    socketId: socket.id,
-    userId: socket.data.userId,
-    name: socket.data.name,
-    roomCode: socket.data.roomCode,
-  });
+  // console.log('player joined room', {
+  //   socketId: socket.id,
+  //   userId: socket.data.userId,
+  //   name: socket.data.name,
+  //   roomCode: socket.data.roomCode,
+  // });
 
   io.to(code).emit('lobbyUpdated', lobbyUpdatedPayload);
 }

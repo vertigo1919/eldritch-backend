@@ -160,15 +160,7 @@ export async function resolveRound(io, code) {
         }))
       );
 
-      await updateUserQuestions(
-        rooms[code].players.map((p) => ({
-          user_id: p.userId,
-          total_questions_attempted: p.totalQuestions,
-          hard_questions_correct: p.hardCorrectAnswers,
-          medium_questions_correct: p.mediumCorrectAnswers,
-          easy_questions_correct: p.easyCorrectAnswers,
-        }))
-      );
+      await updateUserQuestions(rooms[code].players);
     } catch (err) {
       console.error('Failed to save match to DB', { code, result, err });
     }

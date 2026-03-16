@@ -1,4 +1,9 @@
-import { updateRoomEnded, saveMatchPlayers, saveMatch } from '../db/queries.js';
+import {
+  updateRoomEnded,
+  saveMatchPlayers,
+  saveMatch,
+  updateUserQuestions,
+} from '../db/queries.js';
 import { ROOM_CLEANUP_DELAY_MS } from '../constants.js';
 import { rooms } from '../rooms.js';
 import { calculateAccuracy } from '../utils/calculateAccuracy.js';
@@ -70,6 +75,8 @@ export async function handleDisconnect(io, socket) {
           accuracy: p.accuracy,
         }))
       );
+
+      await updateUserQuestions(rooms[code].players);
     } catch (err) {
       console.error('Failed to save match to DB after player disconnect', { code, userId, err });
     }

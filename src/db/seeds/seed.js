@@ -64,10 +64,10 @@ async function seed({ questionData, monsterData, characterData }) {
         user_id TEXT PRIMARY KEY,
         display_name TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        total_questions_attempted INT DEFAULT 0
-        hard_questions_correct INT DEFAULT 0
-        medium_questions_correct INT DEFAULT 0
+        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        total_questions_attempted INT DEFAULT 0,
+        hard_questions_correct INT DEFAULT 0,
+        medium_questions_correct INT DEFAULT 0,
         easy_questions_correct INT DEFAULT 0
 
         
