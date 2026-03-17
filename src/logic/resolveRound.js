@@ -182,31 +182,47 @@ export async function resolveRound(io, code) {
   else if (rooms[code].monsterHp === 0) {
     rooms[code].currentStage++;
 
-    // load new monster
-    rooms[code].monster = await getMonsterForStage(rooms[code].currentStage);
-    rooms[code].monsterHp = rooms[code].monster.max_hp;
+    try {
+      // load new monster
 
-    // Load new questions in memory
-    const newDifficulty = DIFFICULTY_MAP[rooms[code].currentStage - 1];
-    const monsterQuestions = await getRandomQuestions(QUESTIONS_PER_MONSTER, newDifficulty);
-    rooms[code].questions = monsterQuestions;
-    rooms[code].questionIds = monsterQuestions.map((question) => question.question_id);
+      rooms[code].monster = await getMonsterForStage(rooms[code].currentStage);
+      rooms[code].monsterHp = rooms[code].monster.max_hp;
 
-    // new stage resets
-    rooms[code].currentQuestionIndex = -1; // // it's startNextRound()'s task to increment this index to 0
-    rooms[code].currentQuestionId = null;
-    rooms[code].answers = {};
+      // Load new questions in memory
+      const newDifficulty = DIFFICULTY_MAP[rooms[code].currentStage - 1];
+      const monsterQuestions = await getRandomQuestions(QUESTIONS_PER_MONSTER, newDifficulty);
+      rooms[code].questions = monsterQuestions;
+      rooms[code].questionIds = monsterQuestions.map((question) => question.question_id);
 
-    const roundResultNextStagePayload = {
-      ...baseResultPayload,
-      isNextStage: true,
-      nextMonster: rooms[code].monster,
-      nextStage: rooms[code].currentStage,
-    };
+      // new stage resets
+      rooms[code].currentQuestionIndex = -1; // // it's startNextRound()'s task to increment this index to 0
+      rooms[code].currentQuestionId = null;
+      rooms[code].answers = {};
 
-    io.to(code).emit('roundResult', roundResultNextStagePayload);
+      const roundResultNextStagePayload = {
+        ...baseResultPayload,
+        isNextStage: true,
+        nextMonster: rooms[code].monster,
+        nextStage: rooms[code].currentStage,
+      };
 
-    startNextRound(io, code);
+      io.to(code).emit('roundResult', roundResultNextStagePayload);
+
+      startNextRound(io, code);
+    } catch (err) {
+      console.error('Failed to load next stage from DB', { code, err });
+      rooms[code].roomStatus = 'ended';
+      const perPlayerAccuracyArray = calculateAccuracy(rooms[code].players);
+
+      io.to(code).emit('gameEnded', {
+        result: 'abandoned',
+        reason: 'server_error',
+        monsterId: rooms[code].monster.monster_id,
+        teamHpFinal: rooms[code].teamHp,
+        monsterHpFinal: rooms[code].monsterHp,
+        perPlayerAccuracy: perPlayerAccuracyArray,
+      });
+    }
   }
 
   // 3)  NEXT ROUND FLOW

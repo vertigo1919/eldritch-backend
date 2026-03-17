@@ -116,11 +116,11 @@ Junction table. One row per player per match, storing their accuracy score. Writ
     code: 'ABCD',
     hostUserId: 'uuid-123',
     roomStatus: 'in-game', // or "lobby" or "ended"
-    startedAt: timestap, 
+    startedAt: timestap,
     players: [
-      { 
-      userId: 'uuid-123', 
-      socketId: 'socket-1', 
+      {
+      userId: 'uuid-123',
+      socketId: 'socket-1',
       name: 'Alice',
       correctAnswers: 5,
       totalQuestions: 10,
@@ -175,38 +175,45 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 
   const rooms = { ABCD: roomStatusExample };
 ```
-## Game lifecyle 
+
+## Game lifecyle
 
 1.  Setup Phase
- - FE: A user opens the game, and either clicks a button to create a room or to join one, the inputted data is held in react memory.
- - FE: A new screen then appears to choose a character, GET request to API to obtain list of available characters. Once selected a joinRoom event is emitted.
- - BE: The server detects the joinRoom event and initialises the room object in memory and updates the users in memory as needed broadcasting everytime a lobbyUpdated event.
- - FE: Users are moved to the lobby. At some point the host clicks on a start game button emitting the StartGame event.
- - BE: The server detects the startGame event triggered by the host and loads initial data (the first monster and the questions) and hands control to the internal logic functions.
+
+- FE: A user opens the game, and either clicks a button to create a room or to join one, the inputted data is held in react memory.
+- FE: A new screen then appears to choose a character, GET request to API to obtain list of available characters. Once selected a joinRoom event is emitted.
+- BE: The server detects the joinRoom event and initialises the room object in memory and updates the users in memory as needed broadcasting everytime a lobbyUpdated event.
+- FE: Users are moved to the lobby. At some point the host clicks on a start game button emitting the StartGame event.
+- BE: The server detects the startGame event triggered by the host and loads initial data (the first monster and the questions) and hands control to the internal logic functions.
 
 2.  Battle Loop
-  - BE startNextRound.js: this is called by startGame. Sets the 15s timer, laods the question and emits roundStarted with the current question. 
-  - FE: the users are shown first question and and mutliple choices and timer. Once a user submits an answer they trigger the custom event "submitAnswer"
-  - BE: The server detects the event SubmitAnswer,  receive and save answer. If all answers are received timer is ended early. It calls resolveRound.js function
-  - BE: resolveRound triggered by the timer expiring (in StartNextRound) OR all answers being in. It calculates damage and updates HPs. If monsters are not defeated and team HP > 0 calls startNextRound and battle loop continues. Once the first monster is defeated, it loads the new one.
+
+- BE startNextRound.js: this is called by startGame. Sets the 15s timer, laods the question and emits roundStarted with the current question.
+- FE: the users are shown first question and and mutliple choices and timer. Once a user submits an answer they trigger the custom event "submitAnswer"
+- BE: The server detects the event SubmitAnswer, receive and save answer. If all answers are received timer is ended early. It calls resolveRound.js function
+- BE: resolveRound triggered by the timer expiring (in StartNextRound) OR all answers being in. It calculates damage and updates HPs. If monsters are not defeated and team HP > 0 calls startNextRound and battle loop continues. Once the first monster is defeated, it loads the new one.
 
 3.  Resolution Phase
-- BE: resolveRound: on the other hand if either monster HP or team HP are <= 0 then gameEnded event is broadcasted  and final stats are saved to the database.
+
+- BE: resolveRound: on the other hand if either monster HP or team HP are <= 0 then gameEnded event is broadcasted and final stats are saved to the database.
 - FE: it lsitens for gameEnded when it reiceves it either shows a win screen or gameover screen.
-    
+
 ## Imporntant considerations
+
 - No need for API endpoints other than GET characters. This because chracters objects are stating and are fetched before the game starts. Once the game stars web sockets are much more suitable.
 - No need for OOP, at least initially, just plain objects.
-- The name/code entry and character selection happens locally in react, only once both are completed joinRoom is emitted by the client  with the full payload (name, userId, roomCode, characterId). This prevents "partial" players in the backend rooms state. If they're in the array, they're fully initialized.
+- The name/code entry and character selection happens locally in react, only once both are completed joinRoom is emitted by the client with the full payload (name, userId, roomCode, characterId). This prevents "partial" players in the backend rooms state. If they're in the array, they're fully initialized.
 
 ## REST API Endpoints
 
 ### GET /api/characters
+
 **Description**: Fetches the static list of available characters for the frontend selection screen before a socket connection is established.
 
 **Query Parameters**: None
 
 **Response**: 200 OK
+
 ```json
 [
   {
@@ -223,7 +230,6 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 ```
 
 ## Sockets : event schema
-
 
 ### joinRoom
 
@@ -285,11 +291,12 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 ### leaveRoom
 
 **direction**: client → server  
-**payload**: none 
+**payload**: none
 **server side effects**:
+
 - Removes player from rooms[code].players.
 - Socket leaves the room
-- If room is  empty: marks room as ended in DB and deletes from memory
+- If room is empty: marks room as ended in DB and deletes from memory
 - If host has left: reassigns hostUserId to the next player in the array
 - Sends lobbyUpdated to remaining players
 - emits in response: lobbyUpdated to room, or nothing if room was deleted
@@ -297,9 +304,11 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 ---
 
 ### requestLobby
+
 **direction**: client → server  
-**payload**: none 
+**payload**: none
 emits in response:
+
 - Success: lobbyUpdated with roomCode, hostUserId, players, roomStatus.
 - Error: lobbyError with message and code NO_ROOM | ROOM_NOT_FOUND.
 
@@ -323,6 +332,7 @@ emits in response:
 
 - Success: roundStarted to room.
 - Error: startError {message, code: "NOT_HOST" | etc}.
+
 ---
 
 ### roundStarted
@@ -386,8 +396,10 @@ emits in response:
   - Else next roundStarted.
 
 **Emits in response**:
+
 - Error: answerError
--  Success: triggers internal round resolution function (resolveRound.js) which subsequently emits roundResult or gameEnded to the room.
+- Success: triggers internal round resolution function (resolveRound.js) which subsequently emits roundResult or gameEnded to the room.
+
 ---
 
 ### roundResult
@@ -435,12 +447,15 @@ emits in response:
 **Sent to**: All in room.
 
 **effects in front end**:
+
 - Update HP: Animate the health bars for both the team and the monster.
 
 optional:
+
 - Show results: Display the correct answer and highlight who got it right/wrong.
 - Refresh Stats: Update the "Live Accuracy" display for each player using correctAnswers and totalQuestions.
 - Wait: Display the results for a few seconds before the next roundStarted event arrives.
+
 ---
 
 ### gameEnded
@@ -453,7 +468,7 @@ optional:
 ```
 {
   "result": "defeat", // or "victory" or "abandoned"
-  "reason": "player_disconnected", // or "monster_defeated" or "out_of_questions" or "team_hp_zero"
+  "reason": "player_disconnected", // or "monster_defeated" or "out_of_questions" or "team_hp_zero" or "server_error"
   "monsterId": 1,
   "teamHpFinal": 0,
   "monsterHpFinal": 45,
@@ -481,8 +496,11 @@ optional:
 - Show final stats.
 
 ---
+
 ## Error Codes
+
 ### joinRoom errors
+
 Event: `joinError` (server to client)
 
 - `NO_NAME` – `"Name is required"`
@@ -496,8 +514,9 @@ Event: `joinError` (server to client)
 - `SERVER_ERROR` - `"A server error occurred"`
 - `ALREADY_IN_THIS_ROOM` - `You are already in this room.`
 - `IN_DIFFERENT_ROOM` - `You are already playing in room [room code]. Please finish or leave that game first.`
-  
-Payload format: 
+
+Payload format:
+
 ```js
 {
   message: string,
@@ -507,15 +526,16 @@ Payload format:
 
 Payload: `{ message: string, code: 'NOROOM' | 'ROOMNOTFOUND' }`
 
-
 ### lobbyError
+
 Event: `lobbyError` (server → client)
+
 - `NO_ROOM` — `You are not in a room`
 - `ROOM_NOT_FOUND` — `Room not found`
 
-
 ### startGame errors
-Event: `startError` (server to client)  
+
+Event: `startError` (server to client)
 
 - `NOT_HOST` – `"Only the host can start the game"`
 - `WRONG_STATUS` – `"Room is not in lobby state"`
@@ -529,8 +549,10 @@ Payload:
   code: 'NOT_HOST' | 'WRONG_STATUS' | 'NOT_ENOUGH_PLAYERS'
 }
 ```
+
 ### submitAnswer errors
-Event: `answerError` (server to client)  
+
+Event: `answerError` (server to client)
 
 `WRONG_STATUS` – `"Room is not in-game"`
 `DEADLINE_PASSED` – `"The answer deadline has passed"`
@@ -538,17 +560,20 @@ Event: `answerError` (server to client)
 `ALREADY_ANSWERED` – `"You have already submitted an answer this round"`
 
 Payload:
+
 ```js
 {
   message: string,
   code: 'WRONG_STATUS' | 'DEADLINE_PASSED' | 'WRONG_QUESTION' | 'ALREADY_ANSWERED'
 }
 ```
+
 ## Internal Game Logic Functions
 
 ### startNextRound(io, code)
-This function handles the preparation and delivery of a new question to the room. It reads the current question data from the room's object, calculates the deadline timestamp, and starts the setTimeout timer that will force the round to end if players do not answer. Once the timer is set, it broadcasts roundStarted payload to all players in the room. This function is called  by handleStartGame for the first question, and then by resolveRound for all subsequent questions.
+
+This function handles the preparation and delivery of a new question to the room. It reads the current question data from the room's object, calculates the deadline timestamp, and starts the setTimeout timer that will force the round to end if players do not answer. Once the timer is set, it broadcasts roundStarted payload to all players in the room. This function is called by handleStartGame for the first question, and then by resolveRound for all subsequent questions.
 
 ### resolveRound(io, code)
 
-This function calculatess the outcome of the player submissions. It clears the round timer, compares each player's submitted answer against the correct option, and deducts health points from the monster for correct answers or from the team for incorrect and missing answers. After updating the HPs, it checks  win and loss . If  team HP reaches zero or the final monster is defeated, it emits  gameEnded . If the game is still active, it emits roundResult and then calls startNextRound to continue the game loop. If the monster's HP reaches zero but it is not the final stage, this function fetches the next monster and set of questions from the database, update the room state, and then calls internal function startNextRound.
+This function calculatess the outcome of the player submissions. It clears the round timer, compares each player's submitted answer against the correct option, and deducts health points from the monster for correct answers or from the team for incorrect and missing answers. After updating the HPs, it checks win and loss . If team HP reaches zero or the final monster is defeated, it emits gameEnded . If the game is still active, it emits roundResult and then calls startNextRound to continue the game loop. If the monster's HP reaches zero but it is not the final stage, this function fetches the next monster and set of questions from the database, update the room state, and then calls internal function startNextRound.
