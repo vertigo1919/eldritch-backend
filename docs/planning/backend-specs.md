@@ -1,8 +1,4 @@
-# Eldritch Game Backend
-
-[Front End Live Demo](https://eldritch-game.netlify.app/)
-
-[Front End Repo](https://github.com/Mdoughty-dev/Eldritch_Game)
+# Eldritch Backend
 
 ## Intro
 
@@ -10,7 +6,7 @@ Eldritch is a multi-player horror-themed quiz-based video game. Built as a web-b
 
 Each match lets a team of 1–4 players face a sequence of three monsters (three stages). Every stage is made up of many rounds where in every round the server sends a multiple-choice question to all players; correct answers damage the monster, while wrong or missing answers damage the shared team HP. Defeat all monsters before the team HP reaches zero to win.
 
-The project was built with a decoupled architecture, using a Node.js game engine on the backend and Phaser on the frontend as a dedicated game-loop renderer. A key engineering decision was to keep Phaser focused on rendering and client-side interaction, while the backend retained authority over the actual game logic. The frontend sends player actions, such as joining a room or selecting an answer, but it does not calculate authoritative outcomes. Instead, it listens for server responses and re-renders accordingly.
+The project was built with a decoupled architecture, using a high-performance Node.js game engine on the backend and Phaser on the frontend as a dedicated game-loop renderer. A key engineering decision was to keep Phaser focused on rendering and client-side interaction, while the backend retained authority over the actual game logic. The frontend sends player actions, such as joining a room or selecting an answer, but it does not calculate authoritative outcomes. Instead, it listens for server responses and re-renders accordingly.
 
 This separation provides several advantages:
 
@@ -22,85 +18,9 @@ This separation provides several advantages:
 
 - **Maintainability:** Phaser handles the experiential layer, while Node.js and Socket.io handle synchronisation and state, keeping responsibilities cleanly separated.
 
-## Local Installation
+## Backed architecture
 
-To run locally
-
-### Create .env files
-
-Create an .env file
-
-```
-PORT=3000
-CLIENT_URL=http://localhost:5173
-DATABASE_URL=postgresql://localhost/eldritch
-PGDATABASE=eldritch
-```
-
-Create an env.development file
-
-```
-PGDATABASE=eldritch
-```
-
-### Install
-
-```bash
-npm install
-npm run setup-dbs
-npm run seed
-npm run dev
-```
-
-If initialised succesfully, you will see the backend is accesible at `http://localhost:3000`
-
-## Backend architecture
-
-### Game lifecyle and relationship to frontend
-
-1.  **Setup Phase**
-
-- FE: A user opens the game, and either clicks a button to create a room or to join one, the inputted data is held in react memory.
-- FE: A new screen then appears to choose a character, GET request to API to obtain list of available characters. Once selected a joinRoom event is emitted.
-- BE: The server detects the `joinRoom` event and initialises the room object in memory and updates the users in memory as needed broadcasting everytime a `lobbyUpdated` event.
-- FE: Users are moved to the lobby. At some point the host clicks on a start game button emitting the `StartGame` event.
-- BE: The server detects the `startGame` event triggered by the host and loads initial data (the first monster and the questions) and hands control to the internal logic functions.
-
-2.  **Battle Loop**
-
-- BE: `startGame` (and subsquently `handleClientReady`) call the function `startNextRound.js`: increments roundNumber, sets the quiz timer, laods the question and emits to the room roundStarted with the current question.
-- FE: the users are shown the question and and mutliple choices and the coundown timer. Once a user submits an answer they trigger the socket event `submitAnswer`.
-- BE: The server detects `SubmitAnswer`, receives validates and saves answer. If all answers are received timer is ended early. Either way, the function `resolveRound.js` is then called.
-- BE: `resolveRound.js` triggered by the timer expiring (in `StartNextRound`) or all answers being in. Calculates damage, updates HPs, and emits `roundResult` to the room. After emitting, it sets room.waitingForHostReady = true and does not call `startNextRound` directly. If a monster was defeated mid-game, the next monster and question set are also loaded from the DB here before `roundResult` is emitted.
-- FE: Displays the round result screen — correct answer, HP changes, per-player results and any necessary animation. Once ready, the FE emits `clientReadyForNextRound`.
-- BE: once it receives `clientReadyForNextRound`, it verifies the sender is the host, clears waitingForHostReady, and calls `startNextRound` — looping back to the top of this battle loop.
-
-3.  **Resolution Phase**
-
-- BE: resolveRound: if either monster HP or team HP are <= 0 then `gameEnded` event is broadcasted and final stats are saved to the database.
-- FE: it listens for `gameEnded` when it reiceves it either shows a win screen or gameover screen.
-
-### Disconnect / Reconnection Flow
-
-The backend distinguishes between two types of player "leaving":
-
-**Intentional leave** (`leaveRoom` event): The player is removed from the room immediately with no delay. If the room is now empty the room record is cleaned up from the database and deleted from memory. If host left, hostUserId is reassigned to the next player. `lobbyUpdated` is broadcast to remaining players.
-
-**Unintentional disconnect** (e.g. tab closed, refresh, network blip): A 10-second grace period timer starts. The player is not removed from the room immediately, allowing them to reconnect. If they reconnect within 10 seconds the timer is cleared and their socketId is updated. If the game is in progress, `roundStarted` is emitted directly to their socket to fast-forward them back into the current round. If the grace period expires without reconnection the server checks the room state:
-
-- Lobby: player is removed, host is reassigned if needed, lobbyUpdated is broadcast.
-
-- In-game: `gameEnded` with reason: "player_disconnected" is broadcast to the room, match stats are saved to the database, and roomStatus is set to "ended".
-
-#### Duplicate tab / second tab prevention
-
-On joinRoom, the server checks whether the userId is already present in any room in memory. If the user is already in the same room their socketId is updated (treated as a reconnect). If they are in a different room a joinError is returned with code IN_DIFFERENT_ROOM, blocking them from joining until they leave or finish their existing game.
-
-## Game Data Handling
-
-The backend serves as the source of truth for the entire application. It combines an in-memory rooms map for live game state, a relational database for persistent cold data (questions, monsters, users, matches), and a small set of shared constants to control pacing and difficulty. Communication with clients uses a hybrid model: event-driven WebSockets for real-time gameplay, supported by targeted REST endpoints for static data retrieval
-
-## Relational Database Architecture
+### Relational Database Architecture
 
 A normalised schema handles long-term "Cold Data" and persistent records, ensuring a clear separation between content, user identity, and match results:
 
@@ -200,25 +120,25 @@ ITEMS {
   MATCHES ||--o{ MATCH_PLAYERS : has
 ```
 
-**USERS**
+USERS
 Stores every player who has ever joined a room. Gets written to on socket joinRoom. Mainly exists so we can tie match history and accuracy stats back to the UUID and so that later on once we add user authentication we already have a user table.
 
-**QUESTIONS**
-Quiz content, seeded once, never written to during gameplay. On startGame and on each stage transition, the server reads from this table to pick QUESTIONS_PER_MONSTER questions for the current monster, based on its difficulty. Questions difficulty is "easy", "medium", "hard".
+QUESTIONS
+Quiz content, seeded once, never written to during gameplay. The server reads from this on startGame to pick a set of questions for the match. Questions difficulty is "easy", "medium", "hard".
 
-**MONSTERS**
+MONSTERS
 Also static seed data. The server reads one row on startGame to get the monster's name and all other details. Monsters difficulty's level is "easy", "medium", "hard".
 
-**CHARACTERS**
+CHARACTERS
 Static content. Not touched during game, it's here for when we add character picking before the lobby.
 
-**ROOMS**
+ROOMS
 A record that a room existed. Written to when the host creates the room, and updated with started_at and ended_at as the game progresses. Useful for game history. N.B. the live game state lives in memory, not here.
 
-**MATCHES**
+MATCHES
 The main record of a completed game, so we have a game history. Only written to at gameEnded. Links a room, a host, and a monster together with the outcome ("defeat", "victory", "abandoned").
 
-**MATCH_PLAYERS**
+MATCH_PLAYERS
 Junction table. One row per player per match, storing their accuracy score. Written to at gameEnded alongside the MATCHES row. We have it so we can build a leaderboard.
 
 ## In-memory game state
@@ -226,10 +146,6 @@ Junction table. One row per player per match, storing their accuracy score. Writ
 To achieve sub-second response times, an in-memory game state system is used. By maintaining "live" data, such as HP, active timers, and room participants, within a server-side **`rooms` object in RAM**, the engine avoids the latency of constant database querying. This "Single-Path" architecture treats solo games and multiplayer rooms identically, ensuring logic remains uniform.
 
 The server also acts as a secure gatekeeper. Sensitive data, such as correct answers and upcoming question IDs, are kept strictly hidden in memory. By only emitting the question text and options, the architecture prevents client-side cheating via network inspection.
-
-### Questions in memory
-
-When a game starts, the backend loads a batch of QUESTIONS_PER_MONSTER questions per monster (currently 50) from the QUESTIONS table based on the current stage difficulty. These questions are stored on the room object in the in-memory rooms map. The correct options never leave the backend; only the prompt and answer options are sent to clients, which prevents cheating via network inspection and means this number can be reduced later to make games shorter or harder.
 
 ```js
   const roomStatusExample = {
@@ -294,7 +210,7 @@ When a game starts, the backend loads a batch of QUESTIONS_PER_MONSTER questions
     answers: {
       'uuid-123': null
     },
-    disconnectTimers: {'uuid-123': {Timeout object}, /* ... */
+    disconnectTimers: {'uuid-123': {Timeout object}, // ...
     }, // holds per-plyaer timeout details for the grace period reconnection logic
     waitingForHostReady: true, //boolean  set to true in resolveRound after a round ends. Used to wait to fire startNextRound until the front end sends clientReadyForNextRound.
   };
@@ -302,20 +218,64 @@ When a game starts, the backend loads a batch of QUESTIONS_PER_MONSTER questions
   const rooms = { ABCD: roomStatusExample };
 ```
 
+## Game lifecyle
+
+1.  Setup Phase
+
+- FE: A user opens the game, and either clicks a button to create a room or to join one, the inputted data is held in react memory.
+- FE: A new screen then appears to choose a character, GET request to API to obtain list of available characters. Once selected a joinRoom event is emitted.
+- BE: The server detects the `joinRoom` event and initialises the room object in memory and updates the users in memory as needed broadcasting everytime a `lobbyUpdated` event.
+- FE: Users are moved to the lobby. At some point the host clicks on a start game button emitting the `StartGame` event.
+- BE: The server detects the `startGame` event triggered by the host and loads initial data (the first monster and the questions) and hands control to the internal logic functions.
+
+2.  Battle Loop
+
+- BE: `startGame` (and subsquently `handleClientReady`) call the function `startNextRound.js`: increments roundNumber, sets the quiz timer, laods the question and emits to the room roundStarted with the current question.
+- FE: the users are shown the question and and mutliple choices and the coundown timer. Once a user submits an answer they trigger the socket event `submitAnswer`.
+- BE: The server detects `SubmitAnswer`, receives validates and saves answer. If all answers are received timer is ended early. Either way, the function `resolveRound.js` is then called.
+- BE: `resolveRound.js` triggered by the timer expiring (in `StartNextRound`) or all answers being in. Calculates damage, updates HPs, and emits `roundResult` to the room. After emitting, it sets room.waitingForHostReady = true and does not call `startNextRound` directly. If a monster was defeated mid-game, the next monster and question set are also loaded from the DB here before `roundResult` is emitted.
+- FE: Displays the round result screen — correct answer, HP changes, per-player results and any necessary animation. Once ready, the FE emits `clientReadyForNextRound`.
+- BE: once it receives `clientReadyForNextRound`, it verifies the sender is the host, clears waitingForHostReady, and calls `startNextRound` — looping back to the top of this battle loop.
+
+3.  Resolution Phase
+
+- BE: resolveRound: if either monster HP or team HP are <= 0 then `gameEnded` event is broadcasted and final stats are saved to the database.
+- FE: it listens for `gameEnded` when it reiceves it either shows a win screen or gameover screen.
+
+### Disconnect / Reconnection Flow
+
+The backend distinguishes between two types of player "leaving":
+
+**Intentional leave** (`leaveRoom` event): The player is removed from the room immediately with no delay. If the room is now empty the room record is cleaned up from the database and deleted from memory. If host left, hostUserId is reassigned to the next player. `lobbyUpdated` is broadcast to remaining players.
+
+**Unintentional disconnect** (e.g. tab closed, refresh, network blip): A 10-second grace period timer starts. The player is not removed from the room immediately, allowing them to reconnect. If they reconnect within 10 seconds the timer is cleared and their socketId is updated. If the game is in progress, `roundStarted` is emitted directly to their socket to fast-forward them back into the current round. If the grace period expires without reconnection the server checks the room state:
+
+- Lobby: player is removed, host is reassigned if needed, lobbyUpdated is broadcast.
+
+- In-game: `gameEnded` with reason: "player_disconnected" is broadcast to the room, match stats are saved to the database, and roomStatus is set to "ended".
+
+### Duplicate tab / second tab prevention
+
+On joinRoom, the server checks whether the userId is already present in any room in memory. If the user is already in the same room their socketId is updated (treated as a reconnect). If they are in a different room a joinError is returned with code IN_DIFFERENT_ROOM, blocking them from joining until they leave or finish their existing game.
+
 ## Constants
 
-| Constant                         | Value  | Purpose                                                                                                  |
-| -------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
-| MAX_PLAYERS                      | 4      | Max players per room                                                                                     |
-| MIN_PLAYERS                      | 1      | Min to start a game                                                                                      |
-| TOTAL_STAGES                     | 3      | Number of monsters                                                                                       |
-| QUESTIONS_PER_MONSTER            | 50     | Questions loaded per stage; set to 50 to avoid running out mid-fight, can be reduced to tweak difficulty |
-| ROUND_DURATION_MS                | 15000  | Round timer (ms)                                                                                         |
-| DISCONNECT_GRACE_PERIOD_MS       | 10000  | Reconnection window (ms)                                                                                 |
-| ROOM_CLEANUP_DELAY_MS            | 180000 | Memory cleanup delay after game ends (ms)                                                                |
-| MONSTER_DAMAGE_ADJUSTMENT_FACTOR | 1      | Scales monster damage per extra player                                                                   |
+| Constant                         | Value  | Purpose                                   |
+| -------------------------------- | ------ | ----------------------------------------- |
+| MAX_PLAYERS                      | 4      | Max players per room                      |
+| MIN_PLAYERS                      | 1      | Min to start a game                       |
+| TOTAL_STAGES                     | 3      | Number of monsters                        |
+| QUESTIONS_PER_MONSTER            | 50     | Questions loaded per stage                |
+| ROUND_DURATION_MS                | 15000  | Round timer (ms)                          |
+| DISCONNECT_GRACE_PERIOD_MS       | 10000  | Reconnection window (ms)                  |
+| ROOM_CLEANUP_DELAY_MS            | 180000 | Memory cleanup delay after game ends (ms) |
+| MONSTER_DAMAGE_ADJUSTMENT_FACTOR | 1      | Scales monster damage per extra player    |
 
-## The Hybrid API Approach
+## Game Data Handling
+
+The backend serves as the source of truth for the entire application. The architecture utilises a hybrid system prioritising event-driven WebSockets for the majority of the game, supported by a targeted RESTful pattern for specific data retrieval.
+
+### The Hybrid API Approach
 
 Rather than forcing all communication through one protocol, the architecture is split based on the player's journey:
 
@@ -346,50 +306,31 @@ Rather than forcing all communication through one protocol, the architecture is 
     "backstory": "I'm 82 and I am very wise"
   }
 ]
-```
 
 #### GET /api/leaderboard
 
-**Description**: [placeholder]
-
-**Query Parameters**: None
-
-**Response**: 200 OK
-
-```json
-[
-  {
-    "display_name": "Bob",
-    "created_at": "2025-01-01T12:00:00Z",
-    "last_seen": "2025-01-10T18:30:00Z",
-    "total_questions_attempted": 62,
-    "easy_questions_correct": 5,
-    "medium_questions_correct": 5,
-    "difficult_questions_correct": 5
-  }
-  // ...
-]
+[TO BE ADDED]
 ```
 
 ### Persistent Identity (UUID + Local Storage)
 
 To avoid the friction of a sign-up flow, a stateless identity strategy is used. Unique IDs are generated via the **Web Crypto API** (`crypto.randomUUID()`) and stored in **Local Storage**. This allows the backend to recognise returning players, supporting seamless reconnection to active rooms and long-term stat tracking without needing a full authentication server.
 
-## Sockets : event schema
+### Sockets : event schema
 
 #### joinRoom
 
-**direction**: client to server
+**direction**: client to server  
 **trigger**: user confirms character selection (Final step of the Join/Create flow).
 
 **payload**:
 
 ```
 {
-name: "string",
-roomCode: "string or empty"
-userId: "UUID",
-characterId: 1
+  name: "string",
+  roomCode: "string or empty"
+  userId: "UUID",
+  characterId: 1
 }
 ```
 
@@ -410,17 +351,17 @@ characterId: 1
 
 #### lobbyUpdated
 
-**direction**: server to client
+**direction**: server to client  
 **trigger**: after joinRoom, disconnect, or host change.
 
 **payload**:
 
 ```
 {
-roomCode: "string",
-hostUserId: "string",
-players: [{userId, name, character}],
-roomStatus: "lobby" | "in-game" | "ended"
+  roomCode: "string",
+  hostUserId: "string",
+  players: [{userId, name, character}],
+  roomStatus: "lobby" | "in-game" | "ended"
 }
 ```
 
@@ -436,7 +377,7 @@ roomStatus: "lobby" | "in-game" | "ended"
 
 #### leaveRoom
 
-**direction**: client to server
+**direction**: client to server  
 **payload**: none
 **server side effects**:
 
@@ -451,7 +392,7 @@ roomStatus: "lobby" | "in-game" | "ended"
 
 #### requestLobby
 
-**direction**: client to server
+**direction**: client to server  
 **payload**: none
 emits in response:
 
@@ -462,7 +403,7 @@ emits in response:
 
 #### startGame
 
-**direction**: client to server
+**direction**: client to server  
 **trigger**: host clicks Start.
 
 **payload**: none — roomCode and userId are read server-side from socket.data.
@@ -483,29 +424,29 @@ emits in response:
 
 #### roundStarted
 
-**direction**: server to client
+**direction**: server to client  
 **trigger**: after startGame or roundResult.
 
 **payload**:
 
 ```
 {
-monster: {
-name: "string",
-hp: number,
-maxHp: number,
-image: "string"
-},
-question: {
-id: 3,
-prompt: "string",
-options: { a, b, c, d }
-},
-gameState: {
-teamHp: number,
-roundNumber: number,
-roundDeadline: number
-}
+  monster: {
+    name: "string",
+    hp: number,
+    maxHp: number,
+    image: "string"
+  },
+  question: {
+    id: 3,
+    prompt: "string",
+    options: { a, b, c, d }
+  },
+  gameState: {
+    teamHp: number,
+    roundNumber: number,
+    roundDeadline: number
+  }
 }
 ```
 
@@ -521,7 +462,7 @@ roundDeadline: number
 
 #### submitAnswer
 
-**direction**: client to server
+**direction**: client to server  
 **trigger**: player clicks answer.
 
 **payload**:
@@ -550,43 +491,43 @@ roundDeadline: number
 
 #### roundResult
 
-**direction**: server to client
+**direction**: server to client  
 **trigger**: round resolved.
 
 **payload**:
 
 ```
 {
-"roundNumber": 1,
-"questionId": 10,
-"correctOption": "c",
-"playerResults": [
-{
-"userId": "uuid-123",
-"name": "Alice",
-"answer": "c",
-"isCorrect": true,
-"correctAnswers": 5,
-"totalQuestions": 10
-}, {player2}, etc.
-],
-"teamDamageTaken": 10,
-"monsterDamageTaken": 15,
-"teamHpAfter": 140,
-"monsterHpAfter": 65,
-"isFinalRound": false,
+  "roundNumber": 1,
+  "questionId": 10,
+  "correctOption": "c",
+  "playerResults": [
+    {
+      "userId": "uuid-123",
+      "name": "Alice",
+      "answer": "c",
+      "isCorrect": true,
+      "correctAnswers": 5,
+      "totalQuestions": 10
+    }, {player2}, etc.
+  ],
+  "teamDamageTaken": 10,
+  "monsterDamageTaken": 15,
+  "teamHpAfter": 140,
+  "monsterHpAfter": 65,
+  "isFinalRound": false,
 
 //The following fields are ONLY included if the monster was defeated and the team is moving to next round
 "isNextStage": true,
-"nextStage": 2,
-"nextMonster": {
-"monster_id": 2,
-"name": "Crypt Warden",
-"max_hp": 120,
-"attack_damage": 15,
-"image_name": "",
-"difficulty_level": "medium"
-}
+  "nextStage": 2,
+  "nextMonster": {
+    "monster_id": 2,
+    "name": "Crypt Warden",
+    "max_hp": 120,
+    "attack_damage": 15,
+    "image_name": "",
+    "difficulty_level": "medium"
+  }
 }
 ```
 
@@ -620,27 +561,27 @@ optional:
 
 #### gameEnded
 
-**direction**: server to client
+**direction**: server to client  
 **trigger**: HP hits 0, players run out of questions, or a player disconnects.
 
 **payload**:
 
 ```
 {
-"result": "defeat", // or "victory" or "abandoned"
-"reason": "player_disconnected", // or "monster_defeated" or "out_of_questions" or "team_hp_zero" or "server_error"
-"monsterId": 1,
-"teamHpFinal": 0,
-"monsterHpFinal": 45,
-"perPlayerAccuracy": [
-{
-"userId": "uuid-123",
-"name": "Alice",
-"accuracy": 50,
-"correctAnswers": 5,
-"totalQuestions": 10
-}
-]
+  "result": "defeat", // or "victory" or "abandoned"
+  "reason": "player_disconnected", // or "monster_defeated" or "out_of_questions" or "team_hp_zero" or "server_error"
+  "monsterId": 1,
+  "teamHpFinal": 0,
+  "monsterHpFinal": 45,
+  "perPlayerAccuracy": [
+    {
+      "userId": "uuid-123",
+      "name": "Alice",
+      "accuracy": 50,
+      "correctAnswers": 5,
+      "totalQuestions": 10
+    }
+  ]
 }
 ```
 
@@ -728,11 +669,11 @@ Payload:
 }
 ```
 
-## Internal Game Logic Functions
+### Internal Game Logic Functions
 
 #### startNextRound(io, code)
 
-This function handles the preparation and delivery of a new question to the room. Increments roundNumber and currentQuestionIndex, loads the current question from the room's questions array, calculates the roundDeadline timestamp, and stores a setTimeout reference in room.timerId that will call resolveRound automatically when the 15 seconds expire. Once the timer is set, it broadcasts roundStarted payload to all players in the room. This function is called by handleStartGame for the first question, and by handleClientReady for all subsequent questions.
+This function handles the preparation and delivery of a new question to the room. Increments roundNumber and currentQuestionIndex, loads the current question from the room's questions array, calculates the roundDeadline timestamp, and stores a setTimeout reference in room.timerId that will call resolveRound automatically when the 15 seconds expire. Once the timer is set, it broadcasts roundStarted payload to all players in the room. This function is called by handleStartGame for the first question, and then by resolveRound for all subsequent questions.
 
 #### resolveRound(io, code)
 
