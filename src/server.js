@@ -13,8 +13,6 @@ const io = new Server(httpServer, {
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
     methods: ['GET', 'POST'],
   },
-  pingInterval: 2000,
-  pingTimeout: 4000,
 });
 
 io.on('connection', (socket) => {
