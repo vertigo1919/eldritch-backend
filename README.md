@@ -100,6 +100,53 @@ The backend distinguishes between two types of player "leaving":
 
 On joinRoom, the server checks whether the userId is already present in any room in memory. If the user is already in the same room their socketId is updated (treated as a reconnect). If they are in a different room a joinError is returned with code IN_DIFFERENT_ROOM, blocking them from joining until they leave or finish their existing game.
 
+## Key Engineering Challenges & Solutions
+
+**Room Code Generation (Optimistic Insertion)**
+
+- **Problem:** Generating unique 6-character room codes requires checking if a code already exists. Querying the database first creates a time-of-check to time-of-use vulnerability and doubles the database load during concurrent room creation.
+- **Solution:** The system utilizes an optimistic insertion pattern. The backend assumes the generated code is unique and attempts to insert it immediately. If PostgreSQL rejects the insertion due to a primary key constraint violation (error code `23505`), the server intercepts the specific error, generates a new code, and retries the insertion (up to 5 times). This natively handles concurrent requests and minimizes database queries.
+
+**State Management and Database Load**
+
+- **Problem:** Storing active multiplayer game state—such as team hit points, countdown timers, and submitted answers—in a PostgreSQL database introduces high latency and requires an unsustainable volume of read and write operations during the fast-paced gameplay loop.
+- **Solution:** The backend implements an in-memory game state architecture. The active game data is held within a Node.js `rooms` object in RAM, enabling sub-second data updates and fast WebSocket broadcasting. The relational database is strictly reserved for static content retrieval (questions, monsters, characters) at the start of a match and for archiving the final match statistics when the game concludes.
+
+**Connection Instability and Reconnections**
+
+- **Problem:** Network instability or browser tab refreshes close the WebSocket connection. Automatically removing a player immediately upon disconnection disrupts the cooperative multiplayer session for the entire team.
+- **Solution:** The system employs a delayed-removal disconnect process. When a WebSocket connection closes, the server initiates a 10-second timer. Players are identified by a stateless UUID stored in their browser's Local Storage. If the player reconnects and transmits their UUID before the timer expires, the server cancels the removal sequence, registers their new socket ID, and transmits the current round data to synchronize their client directly back into the live match.
+
+**Security and Client-Side Manipulation**
+
+- **Problem:** Transmitting the complete quiz dataset to the client application exposes the game to network manipulation, allowing users to inspect payloads to identify the correct answers before the timer expires.
+- **Solution:** The Node.js server retains absolute authority over the game data. When a round starts, the server transmits only the question prompt and the available options to the connected clients. The correct answer and the array of upcoming questions remain securely inside the server's memory.
+
+**Client-Side Animation Synchronization**
+
+- **Problem:** If the backend server dispatches the subsequent question immediately after calculating the results of a round, the client application lacks the required time to display damage calculations, health bar reductions, and character animations.
+- **Solution:** The system requires an explicit readiness signal to proceed. Following the calculation and broadcast of the `roundResult`, the backend sets a `waitingForHostReady` state and halts the progression of the match. The backend resumes operation and calls `startNextRound` only after it receives the `clientReadyForNextRound` WebSocket event from the host player's client. This implementation ensures the frontend application has the exact duration it needs to execute visual updates between rounds.
+
+**Duplicate Session and Multi-Tab Prevention**
+
+- **Problem:** Users opening the game in multiple browser tabs simultaneously can create duplicate socket connections tied to the same player identity, leading to race conditions, duplicate answer submissions, and a corrupted game state.
+- **Solution:** The backend implements a strict session-validation check during the connection phase. When a user attempts to join a room, the server scans the active in-memory state. If the player's unique ID is already present and their existing WebSocket is actively connected (not in a temporary disconnection grace period), the server explicitly blocks the new connection attempt and issues an `ALREADY_IN_THIS_ROOM` socket error. This guarantees exactly one active socket per player identity.
+
+**Single-Path Architecture for Solo and Multiplayer Modes**
+
+- **Problem:** Developing separate state management and logic flows for single-player versus multiplayer modes increases code duplication, introduces mode-specific bugs, and complicates future feature development.
+- **Solution:** The system employs a "Single-Path" architecture. Solo play is not treated as a distinct game mode; instead, a solo player is simply routed into a standard multiplayer lobby. The Node.js server processes all game events, timer countdowns, and HP calculations through the exact same WebSocket event pipeline and in-memory `rooms` object regardless of player count, ensuring absolute uniformity in game rules and reducing maintenance overhead.
+
+**Deferred Database Persistence for Real-Time Performance**
+
+- **Problem:** Executing database write operations (such as updating player accuracy, logging match history, and modifying user records) during the live battle loop introduces latency and disrupts the real-time WebSocket synchronization.
+- **Solution:** The backend completely decouples real-time gameplay from persistent storage writes. During an active match, all state changes (damage dealt, answers submitted) are mutated exclusively within the fast in-memory RAM object. PostgreSQL `INSERT` and `UPDATE` queries are strictly deferred until the `gameEnded` event is triggered. At that exact moment, the final game state is aggregated and bulk-written to the database in a single resolution phase.
+
+**Dynamic Host Migration and Privilege Management**
+
+- **Problem:** Multiplayer sessions require a single authoritative client to trigger state transitions (like starting the game or advancing rounds) to prevent conflicting requests. However, assigning these privileges to a single user creates a single point of failure; if the host disconnects, the game session could stall permanently.
+- **Solution:** The backend implements a dynamic host system. The user who creates the room is assigned the `hostUserId`. The frontend uses this ID to conditionally render control buttons, and the backend validates incoming progression events against this ID. If the current host disconnects and their reconnection timer expires, the server automatically executes a host migration. It reassigns the `hostUserId` to the next connected player in the room's roster and broadcasts the updated state to all clients, ensuring the match remains fully playable.
+
 ## Game Data Handling
 
 The backend serves as the source of truth for the entire application. It combines an in-memory rooms map for live game state, a relational database for persistent cold data (questions, monsters, users, matches), and a small set of shared constants to control pacing and difficulty. Communication with clients uses a hybrid model: event-driven WebSockets for real-time gameplay, supported by targeted REST endpoints for static data retrieval
@@ -374,6 +421,14 @@ Rather than forcing all communication through one protocol, the architecture is 
   // ...
 ]
 ```
+
+#### GET /ping
+
+**Description**: A minimal public REST endpoint used to maintain infrastructure uptime. An external scheduling service executes a GET request to this route every five minutes. This continuous network activity prevents the Render web service from suspending the Node.js process and prevents the Supabase PostgreSQL database from pausing, ensuring the server is instantly available when users attempt to play.
+
+**Query Parameters**: None
+
+**Response**: 200 OK
 
 ### Persistent Identity (UUID + Local Storage)
 

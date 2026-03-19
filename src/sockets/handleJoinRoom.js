@@ -158,18 +158,40 @@ export async function handleJoinRoom(io, socket, payload) {
   const task = code ? 'joinRoom' : 'createRoom';
 
   // CREATE ROOM FLOW
-  if (task === 'createRoom') {
-    code = generateRoomCode();
 
-    while (rooms[code]) {
+  if (task === 'createRoom') {
+    let isRoomCreated = false;
+
+    let attempt = 0;
+
+    while (!isRoomCreated && attempt < 5) {
       code = generateRoomCode();
+      attempt++;
+      if (rooms[code]) continue; // i.e. generate a new code
+      // optimistic insertion
+      try {
+        await createRoomRecord(code, userId);
+        isRoomCreated = true;
+      } catch (err) {
+        // '23505' is the PostgreSQL error code for a Unique Violation (duplicate Primary Key), i.e. room with this code already exists in DB
+        if (err.code === '23505') {
+          console.warn(`Room code ${code} already exists in DB. Retrying...`);
+          continue;
+        } else {
+          console.error('DB Error creating room:', err);
+          socket.emit('joinError', {
+            message: 'Unable to create room record in DB',
+            code: 'SERVER_ERROR',
+          });
+        }
+        return;
+      }
     }
 
-    try {
-      await createRoomRecord(code, userId);
-    } catch {
+    if (!isRoomCreated) {
+      console.error('Failed to generate a unique room code after 5 attempts.');
       socket.emit('joinError', {
-        message: 'Unable to create room record in DB',
+        message: 'Server is busy, unable to create a room. Please try again.',
         code: 'SERVER_ERROR',
       });
       return;
