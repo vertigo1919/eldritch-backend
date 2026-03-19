@@ -3,6 +3,7 @@ import {
   saveMatchPlayers,
   saveMatch,
   updateUserQuestions,
+  saveUser,
 } from '../db/queries.js';
 import { ROOM_CLEANUP_DELAY_MS, DISCONNECT_GRACE_PERIOD_MS } from '../constants.js';
 import { rooms } from '../rooms.js';
@@ -11,6 +12,16 @@ import { calculateAccuracy } from '../utils/calculateAccuracy.js';
 export async function handleDisconnect(io, socket) {
   const code = socket.data.roomCode;
   const userId = socket.data.userId;
+  const name = socket.data.name;
+
+  // update last_seen time stamp
+  if (userId && name) {
+    try {
+      await saveUser(userId, name);
+    } catch (err) {
+      console.error('Failed to update last_seen on disconnect', err);
+    }
+  }
 
   // GUARDS
   if (!code) {

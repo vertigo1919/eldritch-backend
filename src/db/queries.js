@@ -6,7 +6,9 @@ export async function saveUser({ user_id, display_name }) {
   await db.query(
     `INSERT INTO users (user_id, display_name) 
      VALUES ($1, $2) 
-     ON CONFLICT (user_id) DO UPDATE SET last_seen = CURRENT_TIMESTAMP`,
+     ON CONFLICT (user_id) DO UPDATE SET
+     displayname = EXCLUDED.displayname,
+     last_seen = CURRENT_TIMESTAMP`,
     [user_id, display_name]
   );
   // added on conflict for returning users
