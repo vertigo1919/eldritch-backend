@@ -222,6 +222,17 @@ export async function resolveRound(io, code) {
         monsterHpFinal: rooms[code].monsterHp,
         perPlayerAccuracy: perPlayerAccuracyArray,
       });
+
+      setTimeout(async () => {
+        if (!rooms[code]) return;
+        try {
+          await updateRoomEnded(code);
+        } catch (err) {
+          console.error('DB Error: Failed to update room ended_at on timeout', { code, err });
+        } finally {
+          delete rooms[code];
+        }
+      }, ROOM_CLEANUP_DELAY_MS);
     }
   }
 
