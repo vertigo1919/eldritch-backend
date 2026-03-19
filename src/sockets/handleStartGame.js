@@ -49,23 +49,31 @@ export async function handleStartGame(io, socket) {
   rooms[code].teamHp = totalSanity;
   rooms[code].maxTeamHp = totalSanity;
 
-  // Load first monster
+  try {
+    // Load first monster
 
-  rooms[code].monster = await getMonsterForStage(1);
-  const scaledHp = scaleMonsterHP(rooms[code].monster.max_hp, rooms[code].players.length);
-  rooms[code].monster.max_hp = scaledHp;
-  rooms[code].monsterHp = scaledHp;
+    rooms[code].monster = await getMonsterForStage(1);
+    const scaledHp = scaleMonsterHP(rooms[code].monster.max_hp, rooms[code].players.length);
+    rooms[code].monster.max_hp = scaledHp;
+    rooms[code].monsterHp = scaledHp;
 
-  // Load questions in memory
+    // Load questions in memory
 
-  const stageDifficulty = DIFFICULTY_MAP[rooms[code].currentStage - 1];
+    const stageDifficulty = DIFFICULTY_MAP[rooms[code].currentStage - 1];
 
-  const monsterQuestions = await getRandomQuestions(QUESTIONS_PER_MONSTER, stageDifficulty);
-  rooms[code].questions = monsterQuestions;
-  rooms[code].questionIds = monsterQuestions.map((question) => question.question_id);
-  rooms[code].currentQuestionIndex = -1; // // it's startNextRound()'s task to increment this index to 0
+    const monsterQuestions = await getRandomQuestions(QUESTIONS_PER_MONSTER, stageDifficulty);
+    rooms[code].questions = monsterQuestions;
+    rooms[code].questionIds = monsterQuestions.map((question) => question.question_id);
+    rooms[code].currentQuestionIndex = -1; // // it's startNextRound()'s task to increment this index to 0
 
-  // initialise empty answer object
-  rooms[code].answers = {};
-  startNextRound(io, code);
+    // initialise empty answer object
+    rooms[code].answers = {};
+    startNextRound(io, code);
+  } catch (err) {
+    console.error('DB Error starting game:', err);
+    socket.emit('startError', {
+      message: 'Failed to load game data from server',
+      code: 'SERVER_ERROR',
+    });
+  }
 }
