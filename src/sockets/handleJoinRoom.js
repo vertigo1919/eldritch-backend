@@ -3,6 +3,7 @@ import { generateRoomCode } from '../utils/generateRoomCode.js';
 import { rooms } from '../rooms.js';
 import { MAX_PLAYERS } from '../constants.js';
 import { getCharacter } from '../db/queries.js';
+import { startNextRound } from '../logic/startNextRound.js';
 
 export async function handleJoinRoom(io, socket, payload) {
   // if we recive a roomCode it means that are trying to join
@@ -93,33 +94,42 @@ export async function handleJoinRoom(io, socket, payload) {
       if (rooms[code].roomStatus === 'in-game') {
         const currentQuestionIndex = rooms[code].currentQuestionIndex;
         const question = rooms[code].questions[currentQuestionIndex];
+        const isHost = rooms[code].hostUserId === userId;
 
-        socket.emit('roundStarted', {
-          monster: {
-            name: rooms[code].monster.name,
-            hp: rooms[code].monsterHp,
-            maxHp: rooms[code].monster.max_hp,
-            image_name: rooms[code].monster.image_name,
-          },
-          question: {
-            id: question.question_id,
-            prompt: question.prompt,
-            options: {
-              a: question.option_a,
-              b: question.option_b,
-              c: question.option_c,
-              d: question.option_d,
+        if (rooms[code].waitingForHostReady) {
+          if (isHost) {
+            rooms[code].waitingForHostReady = false;
+            startNextRound(io, code);
+          }
+        } else {
+          // Normal mid-round reconnect — fast-forward them to the active question
+          socket.emit('roundStarted', {
+            monster: {
+              name: rooms[code].monster.name,
+              hp: rooms[code].monsterHp,
+              maxHp: rooms[code].monster.max_hp,
+              image: rooms[code].monster.image_name,
             },
-          },
-          gameState: {
-            teamHp: rooms[code].teamHp,
-            maxTeamHp: rooms[code].maxTeamHp,
-            roundNumber: rooms[code].roundNumber,
-            roundDeadline: rooms[code].roundDeadline,
-          },
-        });
+            question: {
+              id: question.question_id,
+              prompt: question.prompt,
+              options: {
+                a: question.option_a,
+                b: question.option_b,
+                c: question.option_c,
+                d: question.option_d,
+              },
+            },
+            gameState: {
+              teamHp: rooms[code].teamHp,
+              roundNumber: rooms[code].roundNumber,
+              roundDeadline: rooms[code].roundDeadline,
+            },
+          });
+        }
+
+        return;
       }
-      return;
     } else {
       socket.emit('joinError', {
         message: `You are already playing in room ${existingRoomCodeFound}. Please finish or leave that game first.`,
@@ -127,6 +137,7 @@ export async function handleJoinRoom(io, socket, payload) {
       });
       return;
     }
+    return;
   }
 
   let selectedCharacter;
