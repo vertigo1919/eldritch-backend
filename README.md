@@ -205,7 +205,7 @@ ITEMS {
 ```
 
 **USERS**
-Stores every player who has ever joined a room. Gets written to on socket joinRoom. Mainly exists so we can tie match history and accuracy stats back to the UUID and so that later on once we add user authentication we already have a user table.
+Stores every player who has ever joined a room, keyed by a persistent UUID, and keeps aggregate quiz stats and presence metadata. It is populated and refreshed via the joinRoom, submitAnswer, and disconnect socket flows so match history and leaderboard data can be tied back to a stable identity, and can later be extended to support full user authentication. last_seen is maintained via the saveUser upsert, which runs in three places: on joinRoom (first-time or returning players), on every submitAnswer during a match, and once more on socket disconnect. This keeps last_seen closely aligned with real player activity (answer submissions) while guaranteeing an accurate final timestamp at the moment they leave, without needing a separate heartbeat system. The display_name column always reflects the most recent name the player used when joining, so the leaderboard and match history show their latest chosen name rather than the original one.
 
 **QUESTIONS**
 Quiz content, seeded once, never written to during gameplay. On startGame and on each stage transition, the server reads from this table to pick QUESTIONS_PER_MONSTER questions for the current monster, based on its difficulty. Questions difficulty is "easy", "medium", "hard".

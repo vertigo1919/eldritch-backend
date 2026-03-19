@@ -17,7 +17,7 @@ export async function handleDisconnect(io, socket) {
   // update last_seen time stamp
   if (userId && name) {
     try {
-      await saveUser(userId, name);
+      await saveUser({ user_id: userId, display_name: name });
     } catch (err) {
       console.error('Failed to update last_seen on disconnect', err);
     }

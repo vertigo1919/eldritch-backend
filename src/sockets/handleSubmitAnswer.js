@@ -17,7 +17,6 @@ export async function handleSubmitAnswer(io, socket, payload) {
       message: 'Room is not in-game',
       code: 'WRONG_STATUS',
     });
-    return;
   }
 
   if (rooms[code].roundDeadline < Date.now()) {
@@ -48,7 +47,7 @@ export async function handleSubmitAnswer(io, socket, payload) {
   rooms[code].answers[userId] = answer;
 
   try {
-    await saveUser(userId, name);
+    await saveUser({ user_id: userId, display_name: name });
   } catch (err) {
     console.error('Failed to update last_seen on answer', err);
   }
