@@ -7,7 +7,7 @@ export async function saveUser({ user_id, display_name }) {
     `INSERT INTO users (user_id, display_name) 
      VALUES ($1, $2) 
      ON CONFLICT (user_id) DO UPDATE SET
-     displayname = EXCLUDED.display_name,
+     display_name = EXCLUDED.display_name,
      last_seen = CURRENT_TIMESTAMP`,
     [user_id, display_name]
   );
