@@ -89,8 +89,9 @@ PGDATABASE=eldritch
 To host the front end you will need to:
 
 27. Create a netifly account
-28. Make sure to have created a fork of the FE repo
-29. Add an env.production to your FE repo with the following `VITE_SERVER_URL=https://eldritch-backend.onrender.com`
+28. Make sure to have created a clone or a fork of the FE repo
+29. Add a netifly enviroment variable: VITE_SERVER_URL= [your-deployed-render.com-address]
 30. Connect to your github account and select the FE rep
 31. Deploy on netifly
 32. Add to your render.com backend and env variable name: `CLIENT_URL` and value: `[your-deployed-netifly-address]`
+33. Alternatively instead of 29 you can create a local .env.production in your local FE repo with the env variable, then build locally and push to netifly via command line.
